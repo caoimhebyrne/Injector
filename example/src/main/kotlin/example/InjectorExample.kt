@@ -16,30 +16,34 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.example
+package example
 
 import dev.dreamhopping.injector.Injector
 import dev.dreamhopping.injector.clazz.loader.InjectorClassLoader
 import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
 import dev.dreamhopping.injector.position.InjectPosition
 
+/**
+ * Called from EntryPoint.kt
+ */
 class InjectorExample {
     fun run() {
         val classLoader = Thread.currentThread().contextClassLoader as InjectorClassLoader
         classLoader.addTransformer(InjectorClassTransformer())
 
-        Injector.inject("dev/dreamhopping/example/Test", "print", InjectPosition.BEFORE_ALL) {
+        Injector.inject("example/TargetClass", "print", InjectPosition.BEFORE_ALL) {
             println("wow before all...")
         }
 
-        Injector.inject("dev/dreamhopping/example/Test", "print", InjectPosition.BEFORE_RETURN) {
+        // You can format it using "/" or "."!
+        Injector.inject("example.TargetClass", "print", InjectPosition.BEFORE_RETURN) {
             println("wow before return...")
         }
 
-        Injector.inject("dev/dreamhopping/example/Test", "print", InjectPosition.BEFORE_RETURN) {
+        Injector.inject("example/TargetClass", "print", InjectPosition.BEFORE_RETURN) {
             println("you can have multiple at one position...")
         }
 
-        Test().print()
+        TargetClass().print()
     }
 }

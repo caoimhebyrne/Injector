@@ -16,5 +16,19 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-rootProject.name = "Injector"
-include("example")
+plugins {
+    kotlin("jvm")
+}
+
+group = "dev.dreamhopping"
+version = "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+    maven("https://maven.hackery.site/")
+}
+
+dependencies {
+    implementation(kotlin("stdlib"))
+    implementation(rootProject)
+}

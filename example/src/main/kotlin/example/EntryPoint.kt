@@ -16,10 +16,14 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.example
+package example
 
-class Test {
-    fun print() {
-        println("wow iphone...")
-    }
+import dev.dreamhopping.injector.clazz.loader.InjectorClassLoader
+
+fun main(args: Array<String>) {
+    val classLoader = InjectorClassLoader()
+    Thread.currentThread().contextClassLoader = classLoader
+
+    val clazz = classLoader.loadClass("example.InjectorExample")
+    clazz.getMethod("run").invoke(clazz.getDeclaredConstructor().newInstance())
 }
