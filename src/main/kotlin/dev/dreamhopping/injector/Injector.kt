@@ -1,24 +1,24 @@
 package dev.dreamhopping.injector
 
-import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
 import dev.dreamhopping.injector.position.InjectPosition
 import dev.dreamhopping.injector.provider.MethodInjector
 
-class Injector {
-    fun inject(className: String, method: String, position: InjectPosition, code: () -> Unit) =
-        InjectorClassTransformer.methodInjectors.add(MethodInjector(className.replace(".", "/"), method, position, code))
+object Injector {
+    val methodInjectors = mutableListOf<MethodInjector>()
 
-    fun test() {
-        val methodInjector = MethodInjector("test", "test", InjectPosition.BEFORE_ALL) {
-            println("test")
-        }
-
-        methodInjector.code()
+    fun inject(className: String, method: String, position: InjectPosition, code: () -> Unit) {
+        methodInjectors.add(MethodInjector(className.replace(".", "/"), method, position, code))
     }
 
-    companion object {
-        fun callLambda(methodInjector: MethodInjector) {
-            methodInjector.code()
+    @JvmStatic
+    fun callMethodInjectors(className: String, method: String, position: String) {
+        val parsedPos = InjectPosition.fromString(position) ?: throw IllegalStateException("Invalid InjectPosition")
+
+        methodInjectors.filter {
+            it.className == className && it.method == method && it.position == parsedPos
+        }.forEach {
+            it.code()
+            methodInjectors.remove(it)
         }
     }
 }
