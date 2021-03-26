@@ -1,6 +1,6 @@
 # Injector
 A side-project to learn about modifying classes at runtime using ASM. A mixin-like library, shouldn't be used in production
-It was originally meant to be for a previous project of mine, [PufferfishModLoader](https://github.com/PufferfishModLoader), specifically a part of [PufferfishAPI](https://github.com/PufferfishModLoader/PufferfishAPI) but I decided to make it a stand-alone project for my testing purposes.
+It was originally meant to be for a project of mine, [PufferfishModLoader](https://github.com/PufferfishModLoader), specifically a part of [PufferfishAPI](https://github.com/PufferfishModLoader/PufferfishAPI) but I decided to make it a stand-alone project for my testing purposes.
 
 ## Using Injector
 ### Preparing for injecting
