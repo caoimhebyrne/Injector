@@ -20,6 +20,7 @@ package example
 
 class TargetClass {
     fun print() {
-        println("wow iphone...")
+        println("[TargetClass] Hello world!")
+        println("[TargetClass] Current time: ${System.currentTimeMillis()}")
     }
 }

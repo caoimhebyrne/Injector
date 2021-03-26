@@ -59,18 +59,34 @@ class InjectorClassTransformer : IClassTransformer {
             val injectorMethodName = "injectorMethod${methodInjectors.indexOf(injector)}"
             classNode.addMethod(public, injectorMethodName, void, instructions = invokeMethod.instructions)
 
+            // Make an insnList to invoke our injector method
             val (insnList) = assembleBlock {
                 aload_0
                 invokevirtual(name, injectorMethodName, "()V")
             }
 
-            when (injector.position) {
-                InjectPosition.BEFORE_ALL -> {
+            // Invoke our injector method at the specified position
+            when (injector.position::class) {
+                InjectPosition.BeforeAll::class -> {
                     method.instructions.insert(insnList)
                 }
 
-                InjectPosition.BEFORE_RETURN -> {
+                InjectPosition.BeforeReturn::class -> {
                     method.instructions.insertBefore(method.instructions.last.previous, insnList)
+                }
+
+                InjectPosition.Invoke::class -> {
+                    val pos = injector.position as InjectPosition.Invoke
+                    val targetInstruction = method.instructions.filterIsInstance<MethodInsnNode>()
+                        .first { it.name == pos.name && it.desc == pos.descriptor && it.owner == pos.owner }
+
+                    when (pos.position) {
+                        InjectPosition.InvokePosition.AFTER -> method.instructions.insert(targetInstruction, insnList)
+                        InjectPosition.InvokePosition.BEFORE -> method.instructions.insertBefore(
+                            targetInstruction,
+                            insnList
+                        )
+                    }
                 }
             }
         }

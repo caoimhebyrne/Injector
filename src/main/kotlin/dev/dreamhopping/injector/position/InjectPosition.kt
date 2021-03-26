@@ -18,11 +18,18 @@
 
 package dev.dreamhopping.injector.position
 
-enum class InjectPosition {
-    BEFORE_ALL,
-    BEFORE_RETURN;
+sealed class InjectPosition {
+    object BeforeAll : InjectPosition()
+    object BeforeReturn : InjectPosition()
 
-    companion object {
-        fun fromString(string: String) = values().firstOrNull { it.name == string }
+    class Invoke(
+        val owner: String,
+        val name: String,
+        val descriptor: String,
+        val position: InvokePosition = InvokePosition.BEFORE
+    ) : InjectPosition()
+
+    enum class InvokePosition {
+        BEFORE, AFTER;
     }
 }

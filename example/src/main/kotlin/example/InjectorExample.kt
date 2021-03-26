@@ -31,17 +31,34 @@ class InjectorExample {
         val classLoader = Thread.currentThread().contextClassLoader as InjectorClassLoader
         classLoader.addTransformer(InjectorClassTransformer())
 
-        Injector.inject("example/TargetClass", "print", InjectPosition.BEFORE_ALL) {
-            println("wow before all...")
+        Injector.inject("example/TargetClass", "print", InjectPosition.BeforeAll) {
+            println("[InjectorExample] Before all")
         }
 
         // You can format it using "/" or "."!
-        Injector.inject("example.TargetClass", "print", InjectPosition.BEFORE_RETURN) {
-            println("wow before return...")
+        Injector.inject("example.TargetClass", "print", InjectPosition.BeforeReturn) {
+            println("[InjectorExample] Before return")
         }
 
-        Injector.inject("example/TargetClass", "print", InjectPosition.BEFORE_RETURN) {
-            println("you can have multiple at one position...")
+        Injector.inject(
+            "example/TargetClass",
+            "print",
+            InjectPosition.Invoke("java/lang/System", "currentTimeMillis", "()J")
+        ) {
+            println("[InjectorExample] Before invoke System#currentTimeMillis")
+        }
+
+        Injector.inject(
+            "example/TargetClass",
+            "print",
+            InjectPosition.Invoke(
+                "java/io/PrintStream",
+                "println",
+                "(Ljava/lang/Object;)V",
+                InjectPosition.InvokePosition.AFTER
+            )
+        ) {
+            println("[InjectorExample] After invoke PrintStream#printLn")
         }
 
         TargetClass().print()

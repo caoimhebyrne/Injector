@@ -24,6 +24,7 @@ import dev.dreamhopping.injector.provider.MethodInjector
 object Injector {
     val methodInjectors = mutableListOf<MethodInjector>()
 
+    @JvmStatic
     fun inject(className: String, method: String, position: InjectPosition, code: () -> Unit) {
         methodInjectors.add(MethodInjector(className.replace(".", "/"), method, position, code))
     }
