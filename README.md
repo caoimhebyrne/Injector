@@ -2,7 +2,8 @@
 A side-project to learn about modifying classes at runtime using ASM. A mixin-like library, shouldn't be used in production
 It was originally meant to be for a previous project of mine, [PufferfishModLoader](https://github.com/PufferfishModLoader), specifically a part of [PufferfishAPI](https://github.com/PufferfishModLoader/PufferfishAPI) but I decided to make it a stand-alone project for my testing purposes.
 
-## Preparing for injecting
+## Using Injector
+### Preparing for injecting
 It is advised to change your classloader as early as possible to make sure you can inject into the classes that you wish to. 
 
 ``EntryPoint.kt``
@@ -29,7 +30,7 @@ fun run() {
 }
 ```
 
-## Using Injector
+### Injecting into a target class
 Once you have your classloader changed, you can start using Injector!
 ```kt
 Injector.inject("dev/dreamhopping/example/Test", "print", InjectPosition.BEFORE_ALL) {
@@ -41,7 +42,7 @@ Injector.inject("dev.dreamhopping.example.Test", "print", InjectPosition.AFTER_A
 }
 ```
 
-## Example Injector Output
+### Example Injector Output
 When your class is modified at runtime, this is a simplified version of what it will look like in Kotlin code:
 ```kt
 class Test {
