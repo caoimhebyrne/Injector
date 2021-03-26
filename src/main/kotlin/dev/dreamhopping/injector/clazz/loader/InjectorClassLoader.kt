@@ -33,8 +33,7 @@ class InjectorClassLoader : URLClassLoader(emptyArray(), null) {
         if (exclusions.any { name.startsWith(it) }) return javaClass.classLoader.loadClass(name)
 
         val pathName = name.replace(".", "/")
-        val resource = getResource("$pathName.class") ?: throw ClassNotFoundException()
-        var bytes = resource.openStream().readAllBytes()
+        var bytes = getResourceAsStream("$pathName.class")?.use { it.readBytes() } ?: throw ClassNotFoundException()
 
         transformers.forEach { bytes = it.transformClass(pathName, bytes) }
         if (transformers.isNotEmpty() && exportTransformedClass) {
