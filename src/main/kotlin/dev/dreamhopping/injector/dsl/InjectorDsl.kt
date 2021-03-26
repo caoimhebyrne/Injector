@@ -28,6 +28,9 @@ import kotlin.reflect.jvm.javaMethod
 val beforeAll = InjectPosition.BeforeAll
 val beforeReturn = InjectPosition.BeforeReturn
 
+fun afterInvoke(className: String, methodName: String, descriptor: String) =
+    InjectPosition.Invoke(className, methodName, descriptor, InjectPosition.InvokePosition.AFTER)
+
 fun beforeInvoke(className: String, methodName: String, descriptor: String) =
     InjectPosition.Invoke(className, methodName, descriptor)
 
@@ -50,14 +53,11 @@ fun afterInvoke(method: KFunction<*>): InjectPosition.Invoke {
     )
 }
 
-fun afterInvoke(className: String, methodName: String, descriptor: String) =
-    InjectPosition.Invoke(className, methodName, descriptor, InjectPosition.InvokePosition.AFTER)
-
 fun injectMethod(
     className: String,
     methodName: String,
     descriptor: String,
-    position: InjectPosition? = null,
+    position: InjectPosition = InjectPosition.BeforeAll,
     code: () -> Unit
 ) {
     Injector.methodInjectors.add(
@@ -65,7 +65,7 @@ fun injectMethod(
             className,
             methodName,
             descriptor,
-            position ?: InjectPosition.BeforeAll,
+            position,
             code
         )
     )

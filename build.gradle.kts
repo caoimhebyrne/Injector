@@ -30,11 +30,12 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("org.ow2.asm:asm:9.1")
-    implementation("org.ow2.asm:asm-commons:9.1")
-    implementation("org.ow2.asm:asm-tree:9.1")
-
     api(kotlin("reflect"))
+
+    listOf("asm", "asm-tree", "asm-commons").forEach {
+        implementation("org.ow2.asm:$it:9.1")
+    }
+
     api("codes.som.anthony:koffee:8.0.2") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
