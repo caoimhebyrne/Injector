@@ -18,6 +18,7 @@
 
 plugins {
     kotlin("jvm") version "1.4.31"
+    id("maven-publish")
 }
 
 group = "dev.dreamhopping"

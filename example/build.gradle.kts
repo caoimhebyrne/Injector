@@ -17,7 +17,7 @@
  */
 
 plugins {
-    kotlin("jvm")
+    kotlin("jvm") version "1.4.31"
 }
 
 group = "dev.dreamhopping"

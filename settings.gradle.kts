@@ -17,4 +17,3 @@
  */
 
 rootProject.name = "Injector"
-include("example")
