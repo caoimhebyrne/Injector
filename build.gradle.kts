@@ -43,3 +43,11 @@ dependencies {
         exclude(module = "asm-tree")
     }
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
+}
