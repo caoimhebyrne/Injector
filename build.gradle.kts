@@ -25,6 +25,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://maven.hackery.site/")
 }
 
 val asmVersion = "9.1"
@@ -33,4 +34,11 @@ dependencies {
 
     api("org.ow2.asm:asm:$asmVersion")
     api("org.ow2.asm:asm-commons:$asmVersion")
+    api("org.ow2.asm:asm-tree:$asmVersion")
+
+    api("codes.som.anthony:koffee:8.0.2") {
+        exclude(module = "asm")
+        exclude(module = "asm-commons")
+        exclude(module = "asm-tree")
+    }
 }

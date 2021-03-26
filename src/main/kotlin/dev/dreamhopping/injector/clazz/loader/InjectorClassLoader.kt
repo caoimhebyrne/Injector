@@ -19,9 +19,11 @@
 package dev.dreamhopping.injector.clazz.loader
 
 import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
+import java.io.File
 import java.net.URLClassLoader
 
 class InjectorClassLoader : URLClassLoader(emptyArray(), null) {
+    private val exportTransformedClass = System.getProperty("exportTransformedClass", "false").toBoolean()
     private val transformers = mutableListOf<InjectorClassTransformer>()
     private val exclusions =
         mutableListOf("java.", "kotlin.", "sun.", "javax.", "argo.", "org.objectweb.asm.", "dev.dreamhopping.injector.")
@@ -30,11 +32,19 @@ class InjectorClassLoader : URLClassLoader(emptyArray(), null) {
         if (exclusions.any { name.startsWith(it) }) return javaClass.classLoader.loadClass(name)
 
         val pathName = name.replace(".", "/")
-        val resource = getResource("$pathName.class") ?: javaClass.classLoader.getResource("$pathName.class")
-        ?: throw ClassNotFoundException()
-        var bytes = resource.openStream().readAllBytes()
+        val resource = getResource("$pathName.class")
+            ?: javaClass.classLoader.getResource("$pathName.class") ?: throw ClassNotFoundException()
 
+        var bytes = resource.openStream().readAllBytes()
         transformers.forEach { bytes = it.transformClass(pathName, bytes) }
+
+        // Enable this with the JVM argument "-DexportTransformedClass=true" :D
+        if (transformers.isNotEmpty() && exportTransformedClass) {
+            val transformedFile = File("transformed/${name}.class")
+            transformedFile.parentFile.mkdirs()
+            transformedFile.writeBytes(bytes)
+        }
+
         return defineClass(name, bytes, 0, bytes.size)
     }
 

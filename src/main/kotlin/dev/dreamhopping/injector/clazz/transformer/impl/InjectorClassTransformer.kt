@@ -18,20 +18,25 @@
 
 package dev.dreamhopping.injector.clazz.transformer.impl
 
+import codes.som.anthony.koffee.assembleBlock
+import codes.som.anthony.koffee.insns.jvm.aload_0
+import codes.som.anthony.koffee.insns.jvm.invokevirtual
+import codes.som.anthony.koffee.modifiers.public
+import codes.som.anthony.koffee.types.void
 import dev.dreamhopping.injector.Injector
 import dev.dreamhopping.injector.clazz.transformer.IClassTransformer
 import dev.dreamhopping.injector.position.InjectPosition
+import dev.dreamhopping.injector.util.addMethod
+import dev.dreamhopping.injector.util.readBytes
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
 
 class InjectorClassTransformer : IClassTransformer {
     override fun transformClass(name: String, classBytes: ByteArray): ByteArray {
         // Check if any injectors exist for this class
-        println("[InjectorClassTransformer] methodInjectors: ${Injector.methodInjectors}")
-        val applicableMethodInjectors = Injector.methodInjectors.filter { it.className == name }
-        if (applicableMethodInjectors.isEmpty()) return classBytes
+        val methodInjectors = Injector.methodInjectors.filter { it.className == name }
+        if (methodInjectors.isEmpty()) return classBytes
 
         // Load the class bytes into a class node
         val classReader = ClassReader(classBytes)
@@ -39,34 +44,38 @@ class InjectorClassTransformer : IClassTransformer {
         classReader.accept(classNode, ClassReader.EXPAND_FRAMES)
 
         // Apply method injectors
-        applicableMethodInjectors.forEach { injector ->
+        methodInjectors.forEach { injector ->
+            // Get a method for our injector, if none exists, go to the next entry
             val method = classNode.methods.firstOrNull { it.name == injector.method } ?: return@forEach
-            val list = InsnList()
-            list.add(LdcInsnNode(classNode.name))
-            list.add(LdcInsnNode(method.name))
-            list.add(LdcInsnNode(injector.position.name))
-            list.add(
-                MethodInsnNode(
-                    Opcodes.INVOKESTATIC,
-                    "dev/dreamhopping/injector/Injector",
-                    "callMethodInjectors",
-                    "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
-                    false
-                )
-            )
+            println("[InjectorClassTransformer] Applying injector for ${classNode.name}#${method.name} at position ${injector.position}")
+
+            // Read the Unit's class
+            val codeClassNode = ClassNode()
+            val codeClassReader = ClassReader(injector.code.javaClass.readBytes())
+            codeClassReader.accept(codeClassNode, ClassReader.EXPAND_FRAMES)
+
+            // Take the bytecode from Unit#invoke()V and write it to our own function
+            val invokeMethod = codeClassNode.methods.first { it.name == "invoke" && it.desc == "()V" }
+            val injectorMethodName = "injectorMethod${methodInjectors.indexOf(injector)}"
+            classNode.addMethod(public, injectorMethodName, void, instructions = invokeMethod.instructions)
+
+            val (insnList) = assembleBlock {
+                aload_0
+                invokevirtual(name, injectorMethodName, "()V")
+            }
 
             when (injector.position) {
                 InjectPosition.BEFORE_ALL -> {
-                    method.instructions.insert(list)
+                    method.instructions.insert(insnList)
                 }
 
                 InjectPosition.BEFORE_RETURN -> {
-                    method.instructions.insertBefore(method.instructions.last.previous, list)
+                    method.instructions.insertBefore(method.instructions.last.previous, insnList)
                 }
             }
         }
 
-        // Write the transformed class
+        // Write the transformed class and return it
         val classWriter = ClassWriter(ClassWriter.COMPUTE_MAXS)
         classNode.accept(classWriter)
 
