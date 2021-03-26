@@ -36,6 +36,7 @@ class InjectorClassTransformer : IClassTransformer {
                     false
                 )
             )
+
             when (injector.position) {
                 InjectPosition.BEFORE_ALL -> {
                     method.instructions.insert(list)
