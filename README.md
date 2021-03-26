@@ -3,10 +3,30 @@ A side-project to learn about modifying classes at runtime using ASM. A mixin-li
 It was originally meant to be for a previous project of mine, [PufferfishModLoader](https://github.com/PufferfishModLoader), specifically a part of [PufferfishAPI](https://github.com/PufferfishModLoader/PufferfishAPI) but I decided to make it a stand-alone project for my testing purposes.
 
 ## Preparing for injecting
-It is advised to change your classloader as early as possible to make sure you can inject into the classes that you wish to. You must also register the ``InjectorClassTransformer`` but you can register your own if you wish.
+It is advised to change your classloader as early as possible to make sure you can inject into the classes that you wish to. 
+
+``EntryPoint.kt``
 ```kt
-val classLoader = Thread.currentThread().contextClassLoader as InjectorClassLoader
-classLoader.addTransformer(InjectorClassTransformer())
+fun main(args: Array<String>) {
+    val classLoader = InjectorClassLoader()
+    Thread.currentThread().contextClassLoader = classLoader
+
+    // Example of invoking your class through the classloader
+    val clazz = classLoader.loadClass("Example")
+    clazz.getMethod("run").invoke(clazz.getDeclaredConstructor().newInstance())
+}
+```
+
+Now, you can register the ``InjectorClassLoader`` in your class that was called from the entry point.
+
+``Example#run``
+```kt
+fun run() {
+    val classLoader = Thread.currentThread().contextClassLoader as InjectorClassLoader
+    classLoader.addTransformer(InjectorClassTransformer())
+       
+    ...
+}
 ```
 
 ## Using Injector
@@ -17,8 +37,18 @@ Injector.inject("dev/dreamhopping/example/Test", "print", InjectPosition.BEFORE_
 }
 
 Injector.inject("dev.dreamhopping.example.Test", "print", InjectPosition.AFTER_ALL) {
-    println("Goodbye world!")
+    println("Goodbye World!")
 }
+```
 
-Test().print()
+## Example Injector Output
+When your class is modified at runtime, this is a simplified version of what it will look like in Kotlin code:
+```kt
+class Test {
+    fun print() {
+        println("Hello World!") // Injector reference, simplified
+        println("Original code")
+        println("Goodbye World!") // Injector reference, simplified
+    }
+}
 ```
