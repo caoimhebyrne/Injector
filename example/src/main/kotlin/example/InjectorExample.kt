@@ -21,6 +21,10 @@ package example
 import dev.dreamhopping.injector.Injector
 import dev.dreamhopping.injector.clazz.loader.InjectorClassLoader
 import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
+import dev.dreamhopping.injector.dsl.afterInvoke
+import dev.dreamhopping.injector.dsl.beforeInvoke
+import dev.dreamhopping.injector.dsl.beforeReturn
+import dev.dreamhopping.injector.dsl.injectMethod
 import dev.dreamhopping.injector.position.InjectPosition
 
 /**
@@ -31,36 +35,38 @@ class InjectorExample {
         val classLoader = Thread.currentThread().contextClassLoader as InjectorClassLoader
         classLoader.addTransformer(InjectorClassTransformer())
 
-        Injector.inject("example/TargetClass", "print", InjectPosition.BeforeAll) {
+        // Injecting before the existing instructions are executed
+        Injector.inject("example/TargetClass", "print", "()V") {
             println("[InjectorExample] Before all")
         }
 
         // You can format it using "/" or "."!
-        Injector.inject("example.TargetClass", "print", InjectPosition.BeforeReturn) {
+        // You can specify a descriptor, the default is "()V"
+        Injector.inject("example.TargetClass", "print", "()V", InjectPosition.BeforeReturn) {
             println("[InjectorExample] Before return")
         }
 
-        Injector.inject(
-            "example/TargetClass",
-            "print",
-            InjectPosition.Invoke("java/lang/System", "currentTimeMillis", "()J")
-        ) {
+        // You can also use the DSL syntax, with this you can reference a function in your invoke position
+        injectMethod("example/TargetClass", "print", "()V", beforeInvoke(System::currentTimeMillis)) {
             println("[InjectorExample] Before invoke System#currentTimeMillis")
         }
 
-        Injector.inject(
-            "example/TargetClass",
-            "print",
-            InjectPosition.Invoke(
-                "java/io/PrintStream",
-                "println",
-                "(Ljava/lang/Object;)V",
-                InjectPosition.InvokePosition.AFTER
-            )
-        ) {
-            println("[InjectorExample] After invoke PrintStream#printLn")
+        // You can replace InjectPosition.Before(All/Return) with a DSL property
+        injectMethod("example/TargetClass", "print", "()V", beforeReturn) {
+            println("[InjectorExample] Before return using DSL!")
         }
 
+        // Injecting after PrintStream#println has been invoked
+        injectMethod(
+            "example/TargetClass",
+            "print",
+            "()V",
+            afterInvoke("java/io/PrintStream", "println", "(Ljava/lang/Object;)V")
+        ) {
+            println("[InjectorExample] After invoke PrintStream#println")
+        }
+
+        // Once all injectors are applied, call our method
         TargetClass().print()
     }
 }

@@ -25,7 +25,13 @@ object Injector {
     val methodInjectors = mutableListOf<MethodInjector>()
 
     @JvmStatic
-    fun inject(className: String, method: String, position: InjectPosition, code: () -> Unit) {
-        methodInjectors.add(MethodInjector(className.replace(".", "/"), method, position, code))
+    fun inject(
+        className: String,
+        method: String,
+        descriptor: String,
+        position: InjectPosition = InjectPosition.BeforeAll,
+        code: () -> Unit
+    ) {
+        methodInjectors.add(MethodInjector(className.replace(".", "/"), method, descriptor, position, code))
     }
 }

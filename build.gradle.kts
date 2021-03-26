@@ -28,14 +28,13 @@ repositories {
     maven("https://maven.hackery.site/")
 }
 
-val asmVersion = "9.1"
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation("org.ow2.asm:asm:9.1")
+    implementation("org.ow2.asm:asm-commons:9.1")
+    implementation("org.ow2.asm:asm-tree:9.1")
 
-    api("org.ow2.asm:asm:$asmVersion")
-    api("org.ow2.asm:asm-commons:$asmVersion")
-    api("org.ow2.asm:asm-tree:$asmVersion")
-
+    api(kotlin("reflect"))
     api("codes.som.anthony:koffee:8.0.2") {
         exclude(module = "asm")
         exclude(module = "asm-commons")

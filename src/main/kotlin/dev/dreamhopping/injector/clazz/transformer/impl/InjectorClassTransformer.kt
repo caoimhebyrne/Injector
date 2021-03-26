@@ -46,7 +46,8 @@ class InjectorClassTransformer : IClassTransformer {
         // Apply method injectors
         methodInjectors.forEach { injector ->
             // Get a method for our injector, if none exists, go to the next entry
-            val method = classNode.methods.firstOrNull { it.name == injector.method } ?: return@forEach
+            val method = classNode.methods.firstOrNull { it.name == injector.method && it.desc == injector.descriptor }
+                ?: return@forEach
             println("[InjectorClassTransformer] Applying injector for ${classNode.name}#${method.name} at position ${injector.position}")
 
             // Read the Unit's class
