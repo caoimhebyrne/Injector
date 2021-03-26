@@ -13,7 +13,9 @@ classes
 *.ipr
 *.iws
 *.iml
-.idea
+
+.idea/*
+!.idea/copyright/
 
 # gradle
 build
