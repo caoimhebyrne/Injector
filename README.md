@@ -51,7 +51,7 @@ injectMethod("dev/dreamhopping/example/Test", "print", "()V") {
     println("Hello World!")
 }
 
-Injector.inject("dev.dreamhopping.example.Test", "print", "()V", beforeReturn) {
+injectMethod("dev.dreamhopping.example.Test", "print", "()V", beforeReturn) {
     println("Goodbye World!")
 }
 ```
