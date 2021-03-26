@@ -53,12 +53,31 @@ fun afterInvoke(method: KFunction<*>): InjectPosition.Invoke {
     )
 }
 
+fun <T> injectMethod(
+    className: String,
+    methodName: String,
+    descriptor: String,
+    position: InjectPosition = InjectPosition.BeforeAll,
+    code: T.() -> Unit
+) {
+    Injector.methodInjectors.add(
+        MethodInjector(
+            className,
+            methodName,
+            descriptor,
+            position,
+            code
+        )
+    )
+}
+
+@JvmName("injectMethodNonTyped")
 fun injectMethod(
     className: String,
     methodName: String,
     descriptor: String,
     position: InjectPosition = InjectPosition.BeforeAll,
-    code: () -> Unit
+    code: Any.() -> Unit
 ) {
     Injector.methodInjectors.add(
         MethodInjector(

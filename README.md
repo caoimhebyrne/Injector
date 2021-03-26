@@ -32,38 +32,93 @@ fun run() {
 ```
 
 ### Injecting into a target class
+
 Once you have your classloader changed, you can start using Injector!
 
-**Normal example**
+**Our test class**
+
+```kt
+class Test {
+    val aNumberField = 0
+    
+    fun print() {
+        println("Time in millis: ${System.currentTimeMills()}")
+    }
+}
+```
+
+**Using the Injector class**
+
 ```kt
 Injector.inject("dev/dreamhopping/example/Test", "print", "()V", InjectPosition.BeforeAll) {
     println("Hello World!")
 }
 
-Injector.inject("dev.dreamhopping.example.Test", "print", "()V", InjectPosition.BeforeReturn) {
+Injector.inject("dev/dreamhopping/example/Test", "print", "()V", InjectPosition.BeforeReturn) {
     println("Goodbye World!")
 }
 ```
 
-**Kotlin DSL example**
+**Using the Kotlin DSL (more powerful)**
+
 ```kt
 injectMethod("dev/dreamhopping/example/Test", "print", "()V") {
     println("Hello World!")
 }
 
-injectMethod("dev.dreamhopping.example.Test", "print", "()V", beforeReturn) {
+injectMethod("dev/dreamhopping/example/Test", "print", "()V", beforeReturn) {
     println("Goodbye World!")
 }
 ```
 
+You can even access fields and methods from your target class via Injector!
+
+```kt
+injectMethod<Test>("dev/dreamhopping/example/Test", "print", "()V") { // this: Test
+    println("Here, have a field from the target class: $aNumberField")
+}
+```
+
+If you want to insert after or before an invocation of a certain method, you can also do that!
+
+```kt
+injectMethod("dev/dreamhopping/example/Test", "print", "()V", afterInvoke("java/io/PrintStream", "println", "(Ljava/lang/Object;)V")) {
+    println("After println!")
+}
+
+// You can also reference the method without typing out the descriptor and owner fully!
+injectMethod("dev/dreamhopping/example/Test", "print", "()V", afterInvoke(System::currentTimeMillis)) {
+    println("After currentTimeMillis!")
+}
+```
+
 ### Example Injector Output
-When your class is modified at runtime, this is a simplified version of what it will look like in Kotlin code:
+
+When your class is modified at runtime using the injectors above, this is a simplified version of what it will look like
+in Kotlin code.
+
+If you're wondering why the methods seem to be "out of order" that's because the name follows the
+format``injectorMethod{x}``. ``x`` is the array index of the injector, this is **not class specific** and **not in order
+of injection point**.
+
 ```kt
 class Test {
+    val aNumberField = 0
+    
     fun print() {
-        injectorMethod0() // Injector reference
-        println("Original code")
-        injectorMethod1() // Injector reference
+        // Anything starting with injectorMethod{x} 
+        // is an injector reference
+        injectorMethod0()
+        injectorMethod2()
+
+        // Note: currentTimeMillis is not stored in a val, 
+        // this is just easier for illustration purposes
+        val currentTimeMillis = System.currentTimeMills()
+        injectorMethod4()
+
+        println("Time in millis: ${currentTimeMillis}")
+        injectorMethod3()
+        injectorMethod1()
     }
     
     fun injectorMethod0() {
@@ -73,5 +128,17 @@ class Test {
     fun injectorMethod1() {
         println("Goodbye World!")
     }
+    
+    fun injectorMethod2() {
+        println("Here, have a field from the target class: $aNumberField")
+    }
+    
+    fun injectorMethod3() {
+        println("After println!")
+    }
+    
+    fun injectorMethod4() {
+        println("After currentTimeMillis!")
+    } 
 }
 ```

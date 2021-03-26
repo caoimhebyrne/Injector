@@ -20,9 +20,9 @@ package dev.dreamhopping.injector.clazz.transformer.impl
 
 import codes.som.anthony.koffee.assembleBlock
 import codes.som.anthony.koffee.insns.jvm.aload_0
+import codes.som.anthony.koffee.insns.jvm.dup
 import codes.som.anthony.koffee.insns.jvm.invokevirtual
 import codes.som.anthony.koffee.modifiers.public
-import codes.som.anthony.koffee.types.void
 import dev.dreamhopping.injector.Injector
 import dev.dreamhopping.injector.clazz.transformer.IClassTransformer
 import dev.dreamhopping.injector.position.InjectPosition
@@ -30,6 +30,7 @@ import dev.dreamhopping.injector.util.addMethod
 import dev.dreamhopping.injector.util.readBytes
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
 
 class InjectorClassTransformer : IClassTransformer {
@@ -55,15 +56,17 @@ class InjectorClassTransformer : IClassTransformer {
             val codeClassReader = ClassReader(injector.code.javaClass.readBytes())
             codeClassReader.accept(codeClassNode, ClassReader.EXPAND_FRAMES)
 
-            // Take the bytecode from Unit#invoke()V and write it to our own function
-            val invokeMethod = codeClassNode.methods.first { it.name == "invoke" && it.desc == "()V" }
+            // Take the bytecode from Unit#invoke and write it to our own function
+            val invokeMethod =
+                codeClassNode.methods.first { it.name == "invoke" && it.access and Opcodes.ACC_SYNTHETIC == 0 }
             val injectorMethodName = "injectorMethod${methodInjectors.indexOf(injector)}"
-            classNode.addMethod(public, injectorMethodName, void, instructions = invokeMethod.instructions)
+            classNode.addMethod(public, injectorMethodName, invokeMethod.desc, instructions = invokeMethod.instructions)
 
             // Make an insnList to invoke our injector method
             val (insnList) = assembleBlock {
                 aload_0
-                invokevirtual(name, injectorMethodName, "()V")
+                dup
+                invokevirtual(name, injectorMethodName, invokeMethod.desc)
             }
 
             // Invoke our injector method at the specified position

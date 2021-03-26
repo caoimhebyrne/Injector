@@ -19,6 +19,8 @@
 package example
 
 class TargetClass {
+    val aField = "\"this is a field from TargetClass, how cool!\""
+
     fun print() {
         println("[TargetClass] Hello world!")
         println("[TargetClass] Current time: ${System.currentTimeMillis()}")

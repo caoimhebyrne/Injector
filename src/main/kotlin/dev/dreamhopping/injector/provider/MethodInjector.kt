@@ -20,10 +20,10 @@ package dev.dreamhopping.injector.provider
 
 import dev.dreamhopping.injector.position.InjectPosition
 
-data class MethodInjector(
+data class MethodInjector<Any>(
     val className: String,
     val method: String,
     val descriptor: String,
     val position: InjectPosition,
-    val code: () -> Unit
+    val code: Any.() -> Unit
 )

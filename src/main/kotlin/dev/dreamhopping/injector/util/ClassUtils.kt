@@ -20,11 +20,7 @@ package dev.dreamhopping.injector.util
 
 import codes.som.anthony.koffee.MethodAssembly
 import codes.som.anthony.koffee.modifiers.Modifiers
-import codes.som.anthony.koffee.types.TypeLike
-import codes.som.anthony.koffee.types.coerceType
 import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
-import org.objectweb.asm.Opcodes.ASM5
-import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
@@ -41,20 +37,13 @@ fun Class<*>.readBytes(): ByteArray {
  * Adapted from [https://github.com/videogame-hacker/Koffee]
  */
 fun ClassNode.addMethod(
-    access: Modifiers, name: String, returnType: TypeLike, vararg parameterTypes: TypeLike,
-    signature: String? = null, exceptions: Array<Type>? = null, instructions: InsnList? = null,
+    access: Modifiers, name: String, desc: String, instructions: InsnList? = null,
     routine: (MethodAssembly.() -> Unit)? = null
 ) {
-    val descriptor = Type.getMethodDescriptor(coerceType(returnType), *parameterTypes.map(::coerceType).toTypedArray())
-
-    val methodNode = MethodNode(
-        ASM5,
-        access.access,
-        name,
-        descriptor,
-        signature,
-        exceptions?.map { it.internalName }?.toTypedArray()
-    )
+    val methodNode = MethodNode()
+    methodNode.access = access.access
+    methodNode.name = name
+    methodNode.desc = desc
     methodNode.instructions = instructions
 
     val methodAssembly = MethodAssembly(methodNode)

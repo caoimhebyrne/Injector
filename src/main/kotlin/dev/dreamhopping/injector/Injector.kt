@@ -22,15 +22,27 @@ import dev.dreamhopping.injector.position.InjectPosition
 import dev.dreamhopping.injector.provider.MethodInjector
 
 object Injector {
-    val methodInjectors = mutableListOf<MethodInjector>()
+    val methodInjectors = mutableListOf<MethodInjector<*>>()
 
     @JvmStatic
+    fun <T> inject(
+        className: String,
+        method: String,
+        descriptor: String,
+        position: InjectPosition = InjectPosition.BeforeAll,
+        code: T.() -> Unit
+    ) {
+        methodInjectors.add(MethodInjector(className.replace(".", "/"), method, descriptor, position, code))
+    }
+
+    @JvmStatic
+    @JvmName("injectNonTyped")
     fun inject(
         className: String,
         method: String,
         descriptor: String,
         position: InjectPosition = InjectPosition.BeforeAll,
-        code: () -> Unit
+        code: Any.() -> Unit
     ) {
         methodInjectors.add(MethodInjector(className.replace(".", "/"), method, descriptor, position, code))
     }

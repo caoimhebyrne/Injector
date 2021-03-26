@@ -52,8 +52,9 @@ class InjectorExample {
         }
 
         // You can replace InjectPosition.Before(All/Return) with a DSL property
-        injectMethod("example/TargetClass", "print", "()V", beforeReturn) {
-            println("[InjectorExample] Before return using DSL!")
+        // You can also access fields and methods from this class
+        injectMethod<TargetClass>("example/TargetClass", "print", "()V", beforeReturn) {
+            println("[InjectorExample] Before return using DSL! I can access a field, like $aField")
         }
 
         // Injecting after PrintStream#println has been invoked
