@@ -45,6 +45,7 @@ fun ClassNode.addMethod(
     methodNode.name = name
     methodNode.desc = desc
     methodNode.instructions = instructions
+    methodNode.exceptions = listOf()
 
     val methodAssembly = MethodAssembly(methodNode)
     if (routine != null) routine(methodAssembly)
