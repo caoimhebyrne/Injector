@@ -23,7 +23,7 @@ import codes.som.anthony.koffee.modifiers.Modifiers
 import codes.som.anthony.koffee.types.TypeLike
 import codes.som.anthony.koffee.types.coerceType
 import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
-import org.objectweb.asm.Opcodes.ASM7
+import org.objectweb.asm.Opcodes.ASM5
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
@@ -48,7 +48,7 @@ fun ClassNode.addMethod(
     val descriptor = Type.getMethodDescriptor(coerceType(returnType), *parameterTypes.map(::coerceType).toTypedArray())
 
     val methodNode = MethodNode(
-        ASM7,
+        ASM5,
         access.access,
         name,
         descriptor,
