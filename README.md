@@ -48,9 +48,17 @@ When your class is modified at runtime, this is a simplified version of what it 
 ```kt
 class Test {
     fun print() {
-        println("Hello World!") // Injector reference, simplified
+        injectorMethod0() // Injector reference
         println("Original code")
-        println("Goodbye World!") // Injector reference, simplified
+        injectorMethod1() // Injector reference
+    }
+    
+    fun injectorMethod0() {
+        println("Hello World!")
+    }
+    
+    fun injectorMethod1() {
+        println("Goodbye World!")
     }
 }
 ```
