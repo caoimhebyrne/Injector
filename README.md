@@ -33,12 +33,25 @@ fun run() {
 
 ### Injecting into a target class
 Once you have your classloader changed, you can start using Injector!
+
+**Normal example**
 ```kt
-Injector.inject("dev/dreamhopping/example/Test", "print", InjectPosition.BEFORE_ALL) {
+Injector.inject("dev/dreamhopping/example/Test", "print", "()V", InjectPosition.BeforeAll) {
     println("Hello World!")
 }
 
-Injector.inject("dev.dreamhopping.example.Test", "print", InjectPosition.AFTER_ALL) {
+Injector.inject("dev.dreamhopping.example.Test", "print", "()V", InjectPosition.BeforeReturn) {
+    println("Goodbye World!")
+}
+```
+
+**Kotlin DSL example**
+```kt
+injectMethod("dev/dreamhopping/example/Test", "print", "()V") {
+    println("Hello World!")
+}
+
+Injector.inject("dev.dreamhopping.example.Test", "print", "()V", beforeReturn) {
     println("Goodbye World!")
 }
 ```
