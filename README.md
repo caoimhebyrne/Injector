@@ -176,7 +176,30 @@ class Calculator {
 fun main(args: Array<String>) {
     // Injector setup omitted, see the previous section
     
-    injectMethod<Calculator>("Calculator", "add", "(II)V") { params -> // this: Test
+    injectMethod<Calculator>("Calculator", "add", "(II)V") { params -> // this: Calculator
+        val a = params.getOrNull(0) as? Int ?: return
+        val b = params.getOrNull(1) as? Int ?: return
+        
+        println("Adding $a and $b!")
+    }
+    
+    Calculator.add(1, 1)
+}
+```
+
+Simplified output of ``Calculator.kt``
+
+*Note: ``listOf`` is not actually called like this, it's just a simplification to make this easy to read, but the
+concept is the same*
+
+```kt
+class Calculator {
+    fun add(a: Int, b: Int) {
+        injectorMethod0(this, listOf(a, b))
+        return a + b
+    }
+    
+    fun injectorMethod0(obj: Calculator, params: List<Object>) {
         val a = params.getOrNull(0) as? Int ?: return
         val b = params.getOrNull(1) as? Int ?: return
         
