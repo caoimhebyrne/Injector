@@ -1,13 +1,21 @@
 # Injector
-A side-project to learn about modifying classes at runtime using ASM. A mixin-like library, shouldn't be used in production.
 
-It was originally meant to be for a project of mine, [PufferfishModLoader](https://github.com/PufferfishModLoader), specifically a part of [PufferfishAPI](https://github.com/PufferfishModLoader/PufferfishAPI) but I decided to make it a stand-alone project for my testing purposes.
+A side-project to learn about modifying classes at runtime using ASM. A mixin-like library, shouldn't be used in
+production.
+
+It was originally meant to be for a project of mine, [PufferfishModLoader](https://github.com/PufferfishModLoader),
+specifically a part of [PufferfishAPI](https://github.com/PufferfishModLoader/PufferfishAPI) but I decided to make it a
+stand-alone project for my testing purposes.
 
 ## Using Injector
+
 ### Preparing for injecting
-It is advised to change your classloader as early as possible to make sure you can inject into the classes that you wish to. 
+
+It is advised to change your classloader as early as possible to make sure you can inject into the classes that you wish
+to.
 
 ``EntryPoint.kt``
+
 ```kt
 fun main(args: Array<String>) {
     val classLoader = InjectorClassLoader()
@@ -22,6 +30,7 @@ fun main(args: Array<String>) {
 Now, you can register the ``InjectorClassLoader`` in your class that was called from the entry point.
 
 ``Example#run``
+
 ```kt
 fun run() {
     val classLoader = Thread.currentThread().contextClassLoader as InjectorClassLoader
@@ -147,9 +156,13 @@ class Test {
 
 **Accessing parameters from the target method**
 
+With Injector, you can access the parameters of the target method when injecting.
+
+*Note: If you attempt to change a parameter, it will not change them in the target method*
+
 ``Calculator.kt``
 
-```
+```kt
 class Calculator {
     fun add(a: Int, b: Int) {
         return a + b
