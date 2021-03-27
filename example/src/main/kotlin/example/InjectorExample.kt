@@ -18,13 +18,13 @@
 
 package example
 
+import codes.som.anthony.koffee.types.boolean
+import codes.som.anthony.koffee.types.long
+import codes.som.anthony.koffee.types.void
 import dev.dreamhopping.injector.Injector
 import dev.dreamhopping.injector.clazz.loader.InjectorClassLoader
 import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
-import dev.dreamhopping.injector.dsl.afterInvoke
-import dev.dreamhopping.injector.dsl.beforeInvoke
-import dev.dreamhopping.injector.dsl.beforeReturn
-import dev.dreamhopping.injector.dsl.injectMethod
+import dev.dreamhopping.injector.dsl.*
 import dev.dreamhopping.injector.position.InjectPosition
 
 /**
@@ -61,11 +61,14 @@ class InjectorExample {
             println("[InjectorExample] Before invoke System#currentTimeMillis")
         }
 
+        // You can use the DSL syntax to make it easier to construct descriptors!
+        val methodDesc = descriptor(void, String::class, String::class, long, long, boolean)
+
         // You can access parameters from the method you're injecting too!
         injectMethod<TargetClass>(
             "example/TargetClass",
             "print",
-            "(Ljava/lang/String;Ljava/lang/String;JJZ)V"
+            methodDesc
         ) { params ->
             println("[InjectorExample] All params: $params")
         }
@@ -75,7 +78,7 @@ class InjectorExample {
         injectMethod<TargetClass>(
             "example/TargetClass",
             "print",
-            "(Ljava/lang/String;Ljava/lang/String;JJZ)V",
+            methodDesc,
             beforeReturn
         ) {
             println("[InjectorExample] Before return using DSL! I can access a field, like $aField")
@@ -85,8 +88,8 @@ class InjectorExample {
         injectMethod(
             "example/TargetClass",
             "print",
-            "(Ljava/lang/String;Ljava/lang/String;JJZ)V",
-            afterInvoke("java/io/PrintStream", "println", "(Ljava/lang/Object;)V")
+            methodDesc,
+            afterInvoke("java/io/PrintStream", "println", descriptor(void, "java/lang/Object"))
         ) {
             println("[InjectorExample] After invoke PrintStream#println")
         }

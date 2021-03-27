@@ -18,6 +18,8 @@
 
 package dev.dreamhopping.injector.dsl
 
+import codes.som.anthony.koffee.types.TypeLike
+import codes.som.anthony.koffee.types.coerceType
 import dev.dreamhopping.injector.Injector
 import dev.dreamhopping.injector.position.InjectPosition
 import dev.dreamhopping.injector.provider.MethodInjector
@@ -52,6 +54,9 @@ fun afterInvoke(method: KFunction<*>): InjectPosition.Invoke {
         InjectPosition.InvokePosition.AFTER
     )
 }
+
+fun descriptor(returnType: TypeLike, vararg parameterTypes: TypeLike): String =
+    Type.getMethodDescriptor(coerceType(returnType), *parameterTypes.map(::coerceType).toTypedArray())
 
 fun <T> injectMethod(
     className: String,

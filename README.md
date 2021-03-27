@@ -176,7 +176,11 @@ class Calculator {
 fun main(args: Array<String>) {
     // Injector setup omitted, see the previous section
     
-    injectMethod<Calculator>("Calculator", "add", "(II)I") { params -> // this: Calculator
+    injectMethod<Calculator>(
+        "Calculator", 
+        "add", 
+        descriptor(int, int, int)
+    ) { params -> // this: Calculator
         val a = params.getOrNull(0) as? Int ?: return
         val b = params.getOrNull(1) as? Int ?: return
         
@@ -199,7 +203,7 @@ class Calculator {
         return a + b
     }
     
-    fun injectorMethod0(obj: Calculator, params: List<Object>) {
+    fun injectorMethod0(params: List<Object>) {
         val a = params.getOrNull(0) as? Int ?: return
         val b = params.getOrNull(1) as? Int ?: return
         
