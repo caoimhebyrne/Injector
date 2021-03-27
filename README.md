@@ -164,7 +164,7 @@ With Injector, you can access the parameters of the target method when injecting
 
 ```kt
 class Calculator {
-    fun add(a: Int, b: Int) {
+    fun add(a: Int, b: Int): Int {
         return a + b
     }
 }
@@ -176,7 +176,7 @@ class Calculator {
 fun main(args: Array<String>) {
     // Injector setup omitted, see the previous section
     
-    injectMethod<Calculator>("Calculator", "add", "(II)V") { params -> // this: Calculator
+    injectMethod<Calculator>("Calculator", "add", "(II)I") { params -> // this: Calculator
         val a = params.getOrNull(0) as? Int ?: return
         val b = params.getOrNull(1) as? Int ?: return
         
@@ -194,7 +194,7 @@ concept is the same*
 
 ```kt
 class Calculator {
-    fun add(a: Int, b: Int) {
+    fun add(a: Int, b: Int): Int {
         injectorMethod0(this, listOf(a, b))
         return a + b
     }
