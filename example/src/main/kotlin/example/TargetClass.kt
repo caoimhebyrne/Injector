@@ -21,8 +21,15 @@ package example
 class TargetClass {
     val aField = "\"this is a field from TargetClass, how cool!\""
 
-    fun print() {
+    fun print(
+        parameter: String,
+        anotherParameter: String = "wow another param",
+        anotherParameterWow: Long = System.currentTimeMillis(),
+        anotherParameterWowWww: Long = System.currentTimeMillis(),
+        boolean: Boolean = true
+    ) {
         println("[TargetClass] Hello world!")
         println("[TargetClass] Current time: ${System.currentTimeMillis()}")
+        println("[TargetClass] Passed parameter: '$parameter'")
     }
 }

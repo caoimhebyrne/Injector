@@ -25,5 +25,5 @@ data class MethodInjector<Any>(
     val method: String,
     val descriptor: String,
     val position: InjectPosition,
-    val code: Any.() -> Unit
+    val code: Any.(List<Any>) -> Unit
 )

@@ -16,20 +16,18 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-plugins {
-    kotlin("jvm")
-}
+package example
 
-group = "dev.dreamhopping"
-version = "1.0-SNAPSHOT"
+class Example {
+    fun test(string: String, number: Int) {
+        val list = mutableListOf<Any>()
+        list.add(string)
+        list.add(number)
 
-repositories {
-    mavenCentral()
-    maven("https://maven.hackery.site/")
-    maven("https://jitpack.io/")
-}
+        injectorFunction0(list)
+    }
 
-dependencies {
-    implementation(kotlin("stdlib"))
-    implementation(rootProject)
+    fun injectorFunction0(list: List<Any>) {
+        println(list)
+    }
 }

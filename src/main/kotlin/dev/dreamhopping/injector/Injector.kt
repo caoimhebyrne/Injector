@@ -30,7 +30,7 @@ object Injector {
         method: String,
         descriptor: String,
         position: InjectPosition = InjectPosition.BeforeAll,
-        code: T.() -> Unit
+        code: T.(List<Any>) -> Unit
     ) {
         methodInjectors.add(MethodInjector(className.replace(".", "/"), method, descriptor, position, code))
     }
@@ -42,7 +42,7 @@ object Injector {
         method: String,
         descriptor: String,
         position: InjectPosition = InjectPosition.BeforeAll,
-        code: Any.() -> Unit
+        code: Any.(List<Any>) -> Unit
     ) {
         methodInjectors.add(MethodInjector(className.replace(".", "/"), method, descriptor, position, code))
     }

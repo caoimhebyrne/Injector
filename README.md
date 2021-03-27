@@ -92,7 +92,7 @@ injectMethod("dev/dreamhopping/example/Test", "print", "()V", afterInvoke(System
 }
 ```
 
-### Example Injector Output
+**Example Injector Output**
 
 When your class is modified at runtime using the injectors above, this is a simplified version of what it will look like
 in Kotlin code.
@@ -140,5 +140,34 @@ class Test {
     fun injectorMethod4() {
         println("After currentTimeMillis!")
     } 
+}
+```
+
+### Other Injector Features
+
+**Accessing parameters from the target method**
+
+``Calculator.kt``
+
+```
+class Calculator {
+    fun add(a: Int, b: Int) {
+        return a + b
+    }
+}
+```
+
+``EntryPoint.kt``
+
+```kt
+fun main(args: Array<String>) {
+    // Injector setup omitted, see the previous section
+    
+    injectMethod<Calculator>("Calculator", "add", "(II)V") { params -> // this: Test
+        val a = params.getOrNull(0) as? Int ?: return
+        val b = params.getOrNull(1) as? Int ?: return
+        
+        println("Adding $a and $b!")
+    }
 }
 ```

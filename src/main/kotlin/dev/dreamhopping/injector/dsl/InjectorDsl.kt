@@ -58,7 +58,7 @@ fun <T> injectMethod(
     methodName: String,
     descriptor: String,
     position: InjectPosition = InjectPosition.BeforeAll,
-    code: T.() -> Unit
+    code: T.(List<Any>) -> Unit
 ) {
     Injector.methodInjectors.add(
         MethodInjector(
@@ -77,7 +77,7 @@ fun injectMethod(
     methodName: String,
     descriptor: String,
     position: InjectPosition = InjectPosition.BeforeAll,
-    code: Any.() -> Unit
+    code: Any.(List<Any>) -> Unit
 ) {
     Injector.methodInjectors.add(
         MethodInjector(

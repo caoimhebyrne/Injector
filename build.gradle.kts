@@ -27,6 +27,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven("https://maven.hackery.site/")
+    maven("https://jitpack.io/")
 }
 
 dependencies {
@@ -41,6 +42,13 @@ dependencies {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
+    }
+
+    api("com.github.videogame-hacker:koffee-kotlin-reflect-sugar:9821b76eee") {
+        exclude(module = "asm")
+        exclude(module = "asm-commons")
+        exclude(module = "asm-tree")
+        exclude(module = "kotlin-reflect")
     }
 }
 

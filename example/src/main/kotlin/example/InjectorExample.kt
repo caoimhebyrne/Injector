@@ -36,24 +36,48 @@ class InjectorExample {
         classLoader.addTransformer(InjectorClassTransformer())
 
         // Injecting before the existing instructions are executed
-        Injector.inject("example/TargetClass", "print", "()V") {
+        Injector.inject("example/TargetClass", "print", "(Ljava/lang/String;Ljava/lang/String;JJZ)V") {
             println("[InjectorExample] Before all")
         }
 
         // You can format it using "/" or "."!
-        // You can specify a descriptor, the default is "()V"
-        Injector.inject("example.TargetClass", "print", "()V", InjectPosition.BeforeReturn) {
+        // You can specify a descriptor, the default is "(Ljava/lang/String;Ljava/lang/String;JJZ)V"
+        Injector.inject(
+            "example.TargetClass",
+            "print",
+            "(Ljava/lang/String;Ljava/lang/String;JJZ)V",
+            InjectPosition.BeforeReturn
+        ) {
             println("[InjectorExample] Before return")
         }
 
         // You can also use the DSL syntax, with this you can reference a function in your invoke position
-        injectMethod("example/TargetClass", "print", "()V", beforeInvoke(System::currentTimeMillis)) {
+        injectMethod(
+            "example/TargetClass",
+            "print",
+            "(Ljava/lang/String;Ljava/lang/String;JJZ)V",
+            beforeInvoke(System::currentTimeMillis)
+        ) {
             println("[InjectorExample] Before invoke System#currentTimeMillis")
+        }
+
+        // You can access parameters from the method you're injecting too!
+        injectMethod<TargetClass>(
+            "example/TargetClass",
+            "print",
+            "(Ljava/lang/String;Ljava/lang/String;JJZ)V"
+        ) { params ->
+            println("[InjectorExample] All params: $params")
         }
 
         // You can replace InjectPosition.Before(All/Return) with a DSL property
         // You can also access fields and methods from this class
-        injectMethod<TargetClass>("example/TargetClass", "print", "()V", beforeReturn) {
+        injectMethod<TargetClass>(
+            "example/TargetClass",
+            "print",
+            "(Ljava/lang/String;Ljava/lang/String;JJZ)V",
+            beforeReturn
+        ) {
             println("[InjectorExample] Before return using DSL! I can access a field, like $aField")
         }
 
@@ -61,13 +85,13 @@ class InjectorExample {
         injectMethod(
             "example/TargetClass",
             "print",
-            "()V",
+            "(Ljava/lang/String;Ljava/lang/String;JJZ)V",
             afterInvoke("java/io/PrintStream", "println", "(Ljava/lang/Object;)V")
         ) {
             println("[InjectorExample] After invoke PrintStream#println")
         }
 
         // Once all injectors are applied, call our method
-        TargetClass().print()
+        TargetClass().print("string parameter")
     }
 }
