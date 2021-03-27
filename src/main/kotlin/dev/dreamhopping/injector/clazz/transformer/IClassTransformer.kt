@@ -18,6 +18,9 @@
 
 package dev.dreamhopping.injector.clazz.transformer
 
+import org.objectweb.asm.tree.ClassNode
+
 interface IClassTransformer {
     fun transformClass(name: String, classBytes: ByteArray): ByteArray
+    fun transformClassNode(classNode: ClassNode): ClassNode
 }

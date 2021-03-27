@@ -45,14 +45,22 @@ class InjectorClassTransformer : IClassTransformer {
      * @return the transformed class bytes if there are any method injectors, otherwise [classBytes]
      */
     override fun transformClass(name: String, classBytes: ByteArray): ByteArray {
-        // Check if any injectors exist for this class
-        val methodInjectors = Injector.methodInjectors.filter { it.className == name }
-        if (methodInjectors.isEmpty()) return classBytes
-
         // Load the class bytes into a class node
         val classReader = ClassReader(classBytes)
         val classNode = ClassNode()
         classReader.accept(classNode, ClassReader.EXPAND_FRAMES)
+
+        // Write the transformed class and return it
+        val classWriter = ClassWriter(ClassWriter.COMPUTE_MAXS)
+        transformClassNode(classNode).accept(classWriter)
+
+        return classWriter.toByteArray()
+    }
+
+    override fun transformClassNode(classNode: ClassNode): ClassNode {
+        // Check if any injectors exist for this class
+        val methodInjectors = Injector.methodInjectors.filter { it.className == classNode.name }
+        if (methodInjectors.isEmpty()) return classNode
 
         // Apply method injectors
         methodInjectors.forEach { injector ->
@@ -74,12 +82,13 @@ class InjectorClassTransformer : IClassTransformer {
 
             // Make an insnList to invoke our injector method
             val (insnList) = assembleBlock {
-                // Create a new array list and store it in the index of the last slot index + 1
+                // The previous local type and offset
                 var previousType: Type? = null
                 var previousOffset = 0
-                val base = 0.takeIf { Modifier.isStatic(method.access) } ?: 1
-                val arraySlot =
-                    method.instructions.filterIsInstance<VarInsnNode>().maxByOrNull { it.`var` * 2 }?.`var` ?: base
+
+                // Create a new array list and store it in the index of the last slot index + 1
+                val arraySlot = method.maxLocals + 1
+                val isStatic = if (Modifier.isStatic(method.access)) 0 else 1
 
                 // Create a new array list
                 new(ArrayList::class)
@@ -97,7 +106,7 @@ class InjectorClassTransformer : IClassTransformer {
                     val offset = if (previousType?.sort == Type.LONG || previousType?.sort == Type.DOUBLE) 1 else 0
 
                     // Load the next parameter and convert it to a non-primitive if required
-                    instructions.add(primitiveConversionInsnList(index + base + offset + previousOffset, type))
+                    instructions.add(primitiveConversionInsnList(index + isStatic + offset + previousOffset, type))
 
                     // Add the parameter to the list
                     invokevirtual(java.util.ArrayList::class, "add", boolean, java.lang.Object::class)
@@ -112,7 +121,7 @@ class InjectorClassTransformer : IClassTransformer {
                 aload_0
                 dup
                 aload(arraySlot)
-                invokevirtual(name, injectorMethodName, invokeMethod.desc)
+                invokevirtual(classNode.name, injectorMethodName, invokeMethod.desc)
             }
 
             // Invoke our injector method at the specified position
@@ -141,11 +150,7 @@ class InjectorClassTransformer : IClassTransformer {
             }
         }
 
-        // Write the transformed class and return it
-        val classWriter = ClassWriter(ClassWriter.COMPUTE_MAXS)
-        classNode.accept(classWriter)
-
-        return classWriter.toByteArray()
+        return classNode
     }
 
     /**
