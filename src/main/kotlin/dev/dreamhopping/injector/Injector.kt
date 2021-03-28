@@ -19,6 +19,7 @@
 package dev.dreamhopping.injector
 
 import dev.dreamhopping.injector.position.InjectPosition
+import dev.dreamhopping.injector.provider.InjectorParams
 import dev.dreamhopping.injector.provider.MethodInjector
 
 object Injector {
@@ -30,7 +31,7 @@ object Injector {
         method: String,
         descriptor: String,
         position: InjectPosition = InjectPosition.BeforeAll,
-        code: T.(List<Any>) -> Unit
+        code: T.(InjectorParams) -> Unit
     ) {
         methodInjectors.add(MethodInjector(className.replace(".", "/"), method, descriptor, position, code))
     }
@@ -42,7 +43,7 @@ object Injector {
         method: String,
         descriptor: String,
         position: InjectPosition = InjectPosition.BeforeAll,
-        code: Any.(List<Any>) -> Unit
+        code: Any.(InjectorParams) -> Unit
     ) {
         methodInjectors.add(MethodInjector(className.replace(".", "/"), method, descriptor, position, code))
     }

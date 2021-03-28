@@ -29,7 +29,16 @@ class TargetClass {
         boolean: Boolean = true
     ) {
         println("[TargetClass] Hello world!")
+        println("[TargetClass] returnTrue(): ${returnTrue()}")
+        println("[TargetClass] Non primitive value: ${nonPrimitive()}")
+        println("[TargetClass] Array value: ${arrayTesting()}")
         println("[TargetClass] Current time: ${System.currentTimeMillis()}")
+
+        // This will not be run as injector will return after currentTimeMillis
         println("[TargetClass] Passed parameter: '$parameter'")
     }
+
+    private fun returnTrue() = true
+    private fun nonPrimitive() = "this is not a primitive"
+    private fun arrayTesting() = listOf("wow", 0, "crazy")
 }

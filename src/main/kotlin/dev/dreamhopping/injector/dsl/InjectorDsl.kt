@@ -22,6 +22,7 @@ import codes.som.anthony.koffee.types.TypeLike
 import codes.som.anthony.koffee.types.coerceType
 import dev.dreamhopping.injector.Injector
 import dev.dreamhopping.injector.position.InjectPosition
+import dev.dreamhopping.injector.provider.InjectorParams
 import dev.dreamhopping.injector.provider.MethodInjector
 import org.objectweb.asm.Type
 import kotlin.reflect.KFunction
@@ -63,7 +64,7 @@ fun <T> injectMethod(
     methodName: String,
     descriptor: String,
     position: InjectPosition = InjectPosition.BeforeAll,
-    code: T.(List<Any>) -> Unit
+    code: T.(InjectorParams) -> Unit
 ) {
     Injector.methodInjectors.add(
         MethodInjector(
@@ -82,7 +83,7 @@ fun injectMethod(
     methodName: String,
     descriptor: String,
     position: InjectPosition = InjectPosition.BeforeAll,
-    code: Any.(List<Any>) -> Unit
+    code: Any.(InjectorParams) -> Unit
 ) {
     Injector.methodInjectors.add(
         MethodInjector(

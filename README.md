@@ -180,7 +180,7 @@ fun main(args: Array<String>) {
         "Calculator", 
         "add", 
         descriptor(int, int, int)
-    ) { params -> // this: Calculator
+    ) { (params, _) -> // this: Calculator
         val a = params.getOrNull(0) as? Int ?: return
         val b = params.getOrNull(1) as? Int ?: return
         
@@ -199,7 +199,7 @@ concept is the same*
 ```kt
 class Calculator {
     fun add(a: Int, b: Int): Int {
-        injectorMethod0(this, listOf(a, b))
+        injectorMethod0(listOf(a, b))
         return a + b
     }
     
@@ -208,6 +208,58 @@ class Calculator {
         val b = params.getOrNull(1) as? Int ?: return
         
         println("Adding $a and $b!")
+    }
+}
+```
+
+**Modifying return values**
+
+With Injector, you can also add a return instruction inside the target method. This means you can manipulate the return
+values of your target methods!
+
+Here, we will use the Calculator.kt class from the last example.
+
+``EntryPoint.kt``
+
+```
+fun main(args: Array<String>) {
+    // Injector setup omitted, see the previous section
+    injectMethod<Calculator>(
+        "Calculator", 
+        "add", 
+        descriptor(int, int, int)
+    ) { (params, returnInfo) -> // this: Calculator
+        val a = params.getOrNull(0) as? Int ?: return
+        val b = params.getOrNull(1) as? Int ?: return
+        
+        println("Adding $a and ${b * 2}!")
+        returnInfo.cancel(a + b * 2)
+    }
+    
+    Calculator.add(1, 1)
+}
+```
+
+Simplified output of ``Calculator.kt``
+
+```kt
+class Calculator {
+    fun add(a: Int, b: Int): Int {
+        val returnInfo: ReturnInfo
+        injectorMethod0(listOf(a, b), returnInfo)
+        
+        return returnInfo.returnValue // a + b * 2
+        
+        // The old instruction for return a + b is still here, just never reached
+        // return a + b
+    }
+    
+    fun injectorMethod0(params: List<Object>, returnInfo: ReturnInfo) {
+        val a = params.getOrNull(0) as? Int ?: return
+        val b = params.getOrNull(1) as? Int ?: return
+        
+        println("Adding $a and ${(b * 2)}!")
+        returnInfo.cancel(a + (b * 2))
     }
 }
 ```

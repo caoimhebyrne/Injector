@@ -24,7 +24,10 @@ import codes.som.anthony.koffee.types.void
 import dev.dreamhopping.injector.Injector
 import dev.dreamhopping.injector.clazz.loader.InjectorClassLoader
 import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
-import dev.dreamhopping.injector.dsl.*
+import dev.dreamhopping.injector.dsl.beforeInvoke
+import dev.dreamhopping.injector.dsl.beforeReturn
+import dev.dreamhopping.injector.dsl.descriptor
+import dev.dreamhopping.injector.dsl.injectMethod
 import dev.dreamhopping.injector.position.InjectPosition
 
 /**
@@ -69,7 +72,7 @@ class InjectorExample {
             "example/TargetClass",
             "print",
             methodDesc
-        ) { params ->
+        ) { (params) ->
             println("[InjectorExample] All params: $params")
         }
 
@@ -84,14 +87,34 @@ class InjectorExample {
             println("[InjectorExample] Before return using DSL! I can access a field, like $aField")
         }
 
-        // Injecting after PrintStream#println has been invoked
+        // Changing the return value of a method
         injectMethod(
             "example/TargetClass",
-            "print",
-            methodDesc,
-            afterInvoke("java/io/PrintStream", "println", descriptor(void, "java/lang/Object"))
-        ) {
-            println("[InjectorExample] After invoke PrintStream#println")
+            "returnTrue",
+            descriptor(boolean)
+        ) { (_, returnInfo) ->
+            println("[InjectorExample] Overriding return value with false!")
+            returnInfo.cancel(false)
+        }
+
+        // Testing with a non primitive
+        injectMethod(
+            "example/TargetClass",
+            "nonPrimitive",
+            descriptor(String::class)
+        ) { (_, returnInfo) ->
+            println("[InjectorExample] Overriding return value with custom string!")
+            returnInfo.cancel("hello world, it has been overridden")
+        }
+
+        // Testing with array
+        injectMethod(
+            "example/TargetClass",
+            "arrayTesting",
+            descriptor(List::class)
+        ) { (_, returnInfo) ->
+            println("[InjectorExample] Overriding return value with custom array!")
+            returnInfo.cancel(listOf("oooh", 1, "wow"))
         }
 
         // Once all injectors are applied, call our method

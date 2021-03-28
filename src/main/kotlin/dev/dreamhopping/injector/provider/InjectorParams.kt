@@ -16,18 +16,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package example
+package dev.dreamhopping.injector.provider
 
-class Example {
-    fun test(string: String, number: Int) {
-        val list = mutableListOf<Any>()
-        list.add(string)
-        list.add(number)
-
-        injectorFunction0(list)
-    }
-
-    fun injectorFunction0(list: List<Any>) {
-        println(list)
-    }
-}
+data class InjectorParams(
+    val params: List<Any>,
+    val retInfo: MethodInjector.ReturnInfo
+)

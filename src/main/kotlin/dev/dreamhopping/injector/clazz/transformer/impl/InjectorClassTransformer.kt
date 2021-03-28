@@ -24,6 +24,8 @@ import codes.som.anthony.koffee.modifiers.public
 import dev.dreamhopping.injector.Injector
 import dev.dreamhopping.injector.clazz.transformer.IClassTransformer
 import dev.dreamhopping.injector.position.InjectPosition
+import dev.dreamhopping.injector.provider.InjectorParams
+import dev.dreamhopping.injector.provider.MethodInjector
 import dev.dreamhopping.injector.util.addMethod
 import dev.dreamhopping.injector.util.readBytes
 import org.objectweb.asm.ClassReader
@@ -67,7 +69,7 @@ class InjectorClassTransformer : IClassTransformer {
             // Get a method for our injector, if none exists, go to the next entry
             val method = classNode.methods.firstOrNull { it.name == injector.method && it.desc == injector.descriptor }
                 ?: return@forEach
-            println("[InjectorClassTransformer] Applying injector for ${classNode.name}#${method.name} at position ${injector.position}")
+            println("[InjectorClassTransformer] Applying injector for ${classNode.name}#${method.name}")
 
             // Read the Unit's class
             val codeClassNode = ClassNode()
@@ -78,7 +80,7 @@ class InjectorClassTransformer : IClassTransformer {
             val invokeMethod =
                 codeClassNode.methods.first { it.name == "invoke" && it.access and Opcodes.ACC_SYNTHETIC == 0 }
             val injectorMethodName = "injectorMethod${methodInjectors.indexOf(injector)}"
-            classNode.addMethod(public, injectorMethodName, invokeMethod.desc, instructions = invokeMethod.instructions)
+            classNode.addMethod(public, injectorMethodName, invokeMethod.desc, invokeMethod.instructions)
 
             // Make an insnList to invoke our injector method
             val (insnList) = assembleBlock {
@@ -117,11 +119,48 @@ class InjectorClassTransformer : IClassTransformer {
                     previousOffset = offset
                 }
 
-                // Call the injectorMethod{x} with the current class instance and parameter list
-                aload_0
+                // val returnInfo = MethodInjector.returnInfo()
+                new(MethodInjector.ReturnInfo::class)
+                dup
+                invokespecial(MethodInjector.ReturnInfo::class, "<init>", void)
+                astore(arraySlot + 1)
+
+                // val params = InjectorParams(array, returnInfo)
+                new(InjectorParams::class)
                 dup
                 aload(arraySlot)
+                aload(arraySlot + 1)
+                invokespecial(InjectorParams::class, "<init>", void, List::class, MethodInjector.ReturnInfo::class)
+                astore(arraySlot + 2)
+
+                // Call the injectorMethod{x} with the current class instance and parameter list
+                // injectorMethod0(this, returnInfo))
+                aload_0
+                dup
+                aload(arraySlot + 2)
                 invokevirtual(classNode.name, injectorMethodName, invokeMethod.desc)
+
+                // Go to the label retIfTrue if the method was cancelled
+                aload(arraySlot + 1)
+                invokevirtual(MethodInjector.ReturnInfo::class, "getCancelled", boolean)
+                ifeq(L["retIfTrue"])
+
+                // Simplified version of this in Kotlin:
+                //
+                // if (methodReturnType.sort == Type.VOID) return
+                // else return returnInfo.getReturnValue()
+                //
+                val methodReturnType = Type.getReturnType(method.desc)
+                if (methodReturnType.sort == Type.VOID) {
+                    // If the method return type is void, then just insert a return instruction
+                    _return
+                } else {
+                    // If the method returns a value, get the return value provided by the Injector, cast it then return it
+                    aload(arraySlot + 1)
+                    invokevirtual(MethodInjector.ReturnInfo::class, "getReturnValue", Any::class)
+                    instructions.add(returnInstructionForType(methodReturnType))
+                }
+                +L["retIfTrue"]
             }
 
             // Invoke our injector method at the specified position
@@ -152,6 +191,68 @@ class InjectorClassTransformer : IClassTransformer {
 
         return classNode
     }
+
+    /**
+     * Creates a return instruction for an Object type
+     * This will handle casting if it's an object and converting it to a primitive if required
+     * The variable must already be on the stack
+     *
+     * @param type The return type of your method
+     * @return an [InsnList] that returns the variable
+     */
+    private fun returnInstructionForType(type: Type): InsnList =
+        assembleBlock {
+            when (type.sort) {
+                Type.INT -> {
+                    checkcast(java.lang.Integer::class)
+                    invokevirtual(java.lang.Integer::class, "intValue", int)
+                    ireturn
+                }
+                Type.FLOAT -> {
+                    checkcast(java.lang.Float::class)
+                    invokevirtual(java.lang.Float::class, "floatValue", float)
+                    freturn
+                }
+                Type.LONG -> {
+                    checkcast(java.lang.Long::class)
+                    invokevirtual(java.lang.Long::class, "longValue", long)
+                    lreturn
+                }
+                Type.DOUBLE -> {
+                    checkcast(java.lang.Double::class)
+                    invokevirtual(java.lang.Double::class, "doubleValue", double)
+                    dreturn
+                }
+                Type.BOOLEAN -> {
+                    checkcast(java.lang.Boolean::class)
+                    invokevirtual(java.lang.Boolean::class, "booleanValue", boolean)
+                    ireturn
+                }
+                Type.SHORT -> {
+                    checkcast(java.lang.Short::class)
+                    invokevirtual(java.lang.Short::class, "shortValue", short)
+                    ireturn
+                }
+                Type.BYTE -> {
+                    checkcast(java.lang.Byte::class)
+                    invokevirtual(java.lang.Byte::class, "byteValue", byte)
+                    ireturn
+                }
+                Type.CHAR -> {
+                    checkcast(java.lang.Character::class)
+                    invokevirtual(java.lang.Character::class, "charValue", char)
+                    ireturn
+                }
+                Type.OBJECT -> {
+                    checkcast(type)
+                    areturn
+                }
+                Type.ARRAY -> {
+                    checkcast(type)
+                    areturn
+                }
+            }
+        }.first
 
     /**
      * Generates an [InsnList] to convert a primitive (int, float, long, etc.) to a reference type (Integer, Float, Long, etc.)
