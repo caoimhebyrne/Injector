@@ -221,7 +221,7 @@ Here, we will use the Calculator.kt class from the last example.
 
 ``EntryPoint.kt``
 
-```
+```kt
 fun main(args: Array<String>) {
     // Injector setup omitted, see the previous section
     injectMethod<Calculator>(
