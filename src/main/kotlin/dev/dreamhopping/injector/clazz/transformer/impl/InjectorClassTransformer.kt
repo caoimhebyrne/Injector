@@ -32,10 +32,10 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
-import org.objectweb.asm.tree.*
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.InsnList
+import org.objectweb.asm.tree.MethodInsnNode
 import java.lang.reflect.Modifier
-import java.util.*
-import kotlin.collections.ArrayList
 
 class InjectorClassTransformer : IClassTransformer {
     /**
