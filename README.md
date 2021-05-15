@@ -1,11 +1,6 @@
 # Injector
 
-A side-project to learn about modifying classes at runtime using ASM. A mixin-like library, shouldn't be used in
-production.
-
-It was originally meant to be for a project of mine, [PufferfishModLoader](https://github.com/PufferfishModLoader),
-specifically a part of [PufferfishAPI](https://github.com/PufferfishModLoader/PufferfishAPI) but I decided to make it a
-stand-alone project for my testing purposes.
+A side-project to learn about modifying classes at runtime using ASM
 
 ## Using Injector
 
@@ -59,11 +54,11 @@ class Test {
 **Using the Injector class**
 
 ```kt
-Injector.inject("dev/dreamhopping/example/Test", "print", "()V", InjectPosition.BeforeAll) {
+Injector.inject("dev/cbyrne/example/Test", "print", "()V", InjectPosition.BeforeAll) {
     println("Hello World!")
 }
 
-Injector.inject("dev/dreamhopping/example/Test", "print", "()V", InjectPosition.BeforeReturn) {
+Injector.inject("dev/cbyrne/example/Test", "print", "()V", InjectPosition.BeforeReturn) {
     println("Goodbye World!")
 }
 ```
@@ -71,11 +66,11 @@ Injector.inject("dev/dreamhopping/example/Test", "print", "()V", InjectPosition.
 **Using the Kotlin DSL (more powerful)**
 
 ```kt
-injectMethod("dev/dreamhopping/example/Test", "print", "()V") {
+injectMethod("dev/cbyrne/example/Test", "print", "()V") {
     println("Hello World!")
 }
 
-injectMethod("dev/dreamhopping/example/Test", "print", "()V", beforeReturn) {
+injectMethod("dev/cbyrne/example/Test", "print", "()V", beforeReturn) {
     println("Goodbye World!")
 }
 ```
@@ -83,7 +78,7 @@ injectMethod("dev/dreamhopping/example/Test", "print", "()V", beforeReturn) {
 You can even access fields and methods from your target class via Injector!
 
 ```kt
-injectMethod<Test>("dev/dreamhopping/example/Test", "print", "()V") { // this: Test
+injectMethod<Test>("dev/cbyrne/example/Test", "print", "()V") { // this: Test
     println("Here, have a field from the target class: $aNumberField")
 }
 ```
@@ -91,12 +86,12 @@ injectMethod<Test>("dev/dreamhopping/example/Test", "print", "()V") { // this: T
 If you want to insert after or before an invocation of a certain method, you can also do that!
 
 ```kt
-injectMethod("dev/dreamhopping/example/Test", "print", "()V", afterInvoke("java/io/PrintStream", "println", "(Ljava/lang/Object;)V")) {
+injectMethod("dev/cbyrne/example/Test", "print", "()V", afterInvoke("java/io/PrintStream", "println", "(Ljava/lang/Object;)V")) {
     println("After println!")
 }
 
 // You can also reference the method without typing out the descriptor and owner fully!
-injectMethod("dev/dreamhopping/example/Test", "print", "()V", afterInvoke(System::currentTimeMillis)) {
+injectMethod("dev/cbyrne/example/Test", "print", "()V", afterInvoke(System::currentTimeMillis)) {
     println("After currentTimeMillis!")
 }
 ```
@@ -263,3 +258,7 @@ class Calculator {
     }
 }
 ```
+
+## Credits
+- [LlamaLad7](https://github.com/LlamaLad7) assisting with the development of this project
+
