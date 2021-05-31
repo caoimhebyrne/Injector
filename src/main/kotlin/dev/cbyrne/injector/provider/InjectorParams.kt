@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.injector.provider
+package dev.cbyrne.injector.provider
 
 data class InjectorParams(
     val params: List<Any>,

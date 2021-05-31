@@ -21,14 +21,14 @@ package example
 import codes.som.anthony.koffee.types.boolean
 import codes.som.anthony.koffee.types.long
 import codes.som.anthony.koffee.types.void
-import dev.dreamhopping.injector.Injector
-import dev.dreamhopping.injector.clazz.loader.InjectorClassLoader
-import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
-import dev.dreamhopping.injector.dsl.beforeInvoke
-import dev.dreamhopping.injector.dsl.beforeReturn
-import dev.dreamhopping.injector.dsl.descriptor
-import dev.dreamhopping.injector.dsl.injectMethod
-import dev.dreamhopping.injector.position.InjectPosition
+import dev.cbyrne.injector.Injector
+import dev.cbyrne.injector.clazz.loader.InjectorClassLoader
+import dev.cbyrne.injector.clazz.transformer.impl.InjectorClassTransformer
+import dev.cbyrne.injector.dsl.beforeInvoke
+import dev.cbyrne.injector.dsl.beforeReturn
+import dev.cbyrne.injector.dsl.descriptor
+import dev.cbyrne.injector.dsl.injectMethod
+import dev.cbyrne.injector.position.InjectPosition
 
 /**
  * Called from EntryPoint.kt

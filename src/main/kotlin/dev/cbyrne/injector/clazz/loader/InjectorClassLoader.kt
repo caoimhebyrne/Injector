@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.injector.clazz.loader
+package dev.cbyrne.injector.clazz.loader
 
-import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
+import dev.cbyrne.injector.clazz.transformer.impl.InjectorClassTransformer
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
@@ -27,7 +27,7 @@ class InjectorClassLoader : URLClassLoader(emptyArray(), null) {
     private val transformers = mutableListOf<InjectorClassTransformer>()
     private val exportTransformedClass = System.getProperty("exportTransformedClass", "false").toBoolean()
     private val exclusions =
-        mutableListOf("java.", "kotlin.", "sun.", "javax.", "argo.", "org.objectweb.asm.", "dev.dreamhopping.injector.")
+        mutableListOf("java.", "kotlin.", "sun.", "javax.", "argo.", "org.objectweb.asm.", "dev.cbyrne.injector.")
 
     override fun loadClass(name: String): Class<*> {
         if (exclusions.any { name.startsWith(it) }) return javaClass.classLoader.loadClass(name)

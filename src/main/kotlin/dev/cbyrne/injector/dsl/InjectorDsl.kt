@@ -16,14 +16,14 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.injector.dsl
+package dev.cbyrne.injector.dsl
 
 import codes.som.anthony.koffee.types.TypeLike
 import codes.som.anthony.koffee.types.coerceType
-import dev.dreamhopping.injector.Injector
-import dev.dreamhopping.injector.position.InjectPosition
-import dev.dreamhopping.injector.provider.InjectorParams
-import dev.dreamhopping.injector.provider.MethodInjector
+import dev.cbyrne.injector.Injector
+import dev.cbyrne.injector.position.InjectPosition
+import dev.cbyrne.injector.provider.InjectorParams
+import dev.cbyrne.injector.provider.MethodInjector
 import org.objectweb.asm.Type
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod

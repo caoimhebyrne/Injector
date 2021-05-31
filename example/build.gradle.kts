@@ -20,7 +20,7 @@ plugins {
     kotlin("jvm")
 }
 
-group = "dev.dreamhopping"
+group = "dev.cbyrne.injector.example"
 version = "1.0-SNAPSHOT"
 
 repositories {

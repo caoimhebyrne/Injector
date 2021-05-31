@@ -17,12 +17,12 @@
  */
 
 plugins {
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.5.10"
     id("maven-publish")
 }
 
-group = "dev.dreamhopping"
-version = "1.0-SNAPSHOT"
+group = "dev.cbyrne.injector"
+version = "1.0.0"
 
 repositories {
     mavenCentral()

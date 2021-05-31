@@ -16,18 +16,18 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.injector.clazz.transformer.impl
+package dev.cbyrne.injector.clazz.transformer.impl
 
 import codes.som.anthony.koffee.assembleBlock
 import codes.som.anthony.koffee.insns.jvm.*
 import codes.som.anthony.koffee.modifiers.public
-import dev.dreamhopping.injector.Injector
-import dev.dreamhopping.injector.clazz.transformer.IClassTransformer
-import dev.dreamhopping.injector.position.InjectPosition
-import dev.dreamhopping.injector.provider.InjectorParams
-import dev.dreamhopping.injector.provider.MethodInjector
-import dev.dreamhopping.injector.util.addMethod
-import dev.dreamhopping.injector.util.readBytes
+import dev.cbyrne.injector.Injector
+import dev.cbyrne.injector.clazz.transformer.IClassTransformer
+import dev.cbyrne.injector.position.InjectPosition
+import dev.cbyrne.injector.provider.InjectorParams
+import dev.cbyrne.injector.provider.MethodInjector
+import dev.cbyrne.injector.util.addMethod
+import dev.cbyrne.injector.util.readBytes
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
@@ -53,7 +53,7 @@ class InjectorClassTransformer : IClassTransformer {
         classReader.accept(classNode, ClassReader.EXPAND_FRAMES)
 
         // Write the transformed class and return it
-        val classWriter = ClassWriter(ClassWriter.COMPUTE_MAXS)
+        val classWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES)
         transformClassNode(classNode).accept(classWriter)
 
         return classWriter.toByteArray()

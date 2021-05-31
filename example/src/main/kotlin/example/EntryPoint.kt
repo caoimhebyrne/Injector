@@ -18,7 +18,7 @@
 
 package example
 
-import dev.dreamhopping.injector.clazz.loader.InjectorClassLoader
+import dev.cbyrne.injector.clazz.loader.InjectorClassLoader
 
 fun main(args: Array<String>) {
     val classLoader = InjectorClassLoader()

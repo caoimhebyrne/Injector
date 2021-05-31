@@ -16,11 +16,20 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.injector.clazz.transformer
+package dev.cbyrne.injector.position
 
-import org.objectweb.asm.tree.ClassNode
+sealed class InjectPosition {
+    object BeforeAll : InjectPosition()
+    object BeforeReturn : InjectPosition()
 
-interface IClassTransformer {
-    fun transformClass(name: String, classBytes: ByteArray): ByteArray
-    fun transformClassNode(classNode: ClassNode): ClassNode
+    class Invoke(
+        val owner: String,
+        val name: String,
+        val descriptor: String,
+        val position: InvokePosition = InvokePosition.BEFORE
+    ) : InjectPosition()
+
+    enum class InvokePosition {
+        BEFORE, AFTER;
+    }
 }

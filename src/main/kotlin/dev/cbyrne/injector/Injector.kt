@@ -16,11 +16,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.injector
+package dev.cbyrne.injector
 
-import dev.dreamhopping.injector.position.InjectPosition
-import dev.dreamhopping.injector.provider.InjectorParams
-import dev.dreamhopping.injector.provider.MethodInjector
+import dev.cbyrne.injector.position.InjectPosition
+import dev.cbyrne.injector.provider.InjectorParams
+import dev.cbyrne.injector.provider.MethodInjector
 
 object Injector {
     val methodInjectors = mutableListOf<MethodInjector<*>>()

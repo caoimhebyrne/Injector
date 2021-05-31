@@ -16,24 +16,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.injector.provider
+package dev.cbyrne.injector.clazz.transformer
 
-import dev.dreamhopping.injector.position.InjectPosition
+import org.objectweb.asm.tree.ClassNode
 
-data class MethodInjector<Any>(
-    val className: String,
-    val method: String,
-    val descriptor: String,
-    val position: InjectPosition,
-    val code: Any.(InjectorParams) -> Unit
-) {
-    data class ReturnInfo(
-        var cancelled: Boolean = false,
-        var returnValue: Any? = null
-    ) {
-        fun cancel(returnValue: Any? = null) {
-            this.cancelled = true
-            this.returnValue = returnValue
-        }
-    }
+interface IClassTransformer {
+    fun transformClass(name: String, classBytes: ByteArray): ByteArray
+    fun transformClassNode(classNode: ClassNode): ClassNode
 }

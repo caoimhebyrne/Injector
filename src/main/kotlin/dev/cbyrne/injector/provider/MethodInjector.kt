@@ -16,20 +16,24 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.injector.position
+package dev.cbyrne.injector.provider
 
-sealed class InjectPosition {
-    object BeforeAll : InjectPosition()
-    object BeforeReturn : InjectPosition()
+import dev.cbyrne.injector.position.InjectPosition
 
-    class Invoke(
-        val owner: String,
-        val name: String,
-        val descriptor: String,
-        val position: InvokePosition = InvokePosition.BEFORE
-    ) : InjectPosition()
-
-    enum class InvokePosition {
-        BEFORE, AFTER;
+data class MethodInjector<Any>(
+    val className: String,
+    val method: String,
+    val descriptor: String,
+    val position: InjectPosition,
+    val code: Any.(InjectorParams) -> Unit
+) {
+    data class ReturnInfo(
+        var cancelled: Boolean = false,
+        var returnValue: Any? = null
+    ) {
+        fun cancel(returnValue: Any? = null) {
+            this.cancelled = true
+            this.returnValue = returnValue
+        }
     }
 }

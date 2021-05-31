@@ -16,11 +16,11 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.dreamhopping.injector.util
+package dev.cbyrne.injector.util
 
 import codes.som.anthony.koffee.MethodAssembly
 import codes.som.anthony.koffee.modifiers.Modifiers
-import dev.dreamhopping.injector.clazz.transformer.impl.InjectorClassTransformer
+import dev.cbyrne.injector.clazz.transformer.impl.InjectorClassTransformer
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
