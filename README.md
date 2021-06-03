@@ -1,17 +1,30 @@
 # Injector
 
-A side-project to learn about modifying classes at runtime using ASM
+Injector is a Kotlin / Java library for modifying classes at runtime using ASM
 
-## Using Injector
+## Installation
 
-### Preparing for injecting
+```groovy
+repositories {
+    mavenCentral()
+    
+    // Required for Koffee, which is a dependency of Injector
+    maven("https://maven.hackery.site/")
+    
+    // Required to retrieve Injector from GitHub
+    maven("https://jitpack.io/")
+}
 
-It is advised to change your classloader as early as possible to make sure you can inject into the classes that you wish
-to.
+dependencies {
+    implementation("com.github.cbyrneee:Injector:latest-commit-hash")
+}
+```
 
-``EntryPoint.kt``
+## Usage
 
-```kt
+**EntryPoint.kt**
+
+```kotlin
 fun main(args: Array<String>) {
     val classLoader = InjectorClassLoader()
     Thread.currentThread().contextClassLoader = classLoader
@@ -22,243 +35,28 @@ fun main(args: Array<String>) {
 }
 ```
 
-Now, you can register the ``InjectorClassLoader`` in your class that was called from the entry point.
+**Example.kt**
 
-``Example#run``
-
-```kt
+```kotlin
 fun run() {
     val classLoader = Thread.currentThread().contextClassLoader as InjectorClassLoader
     classLoader.addTransformer(InjectorClassTransformer())
        
-    ...
-}
-```
-
-### Injecting into a target class
-
-Once you have your classloader changed, you can start using Injector!
-
-**Our test class**
-
-```kt
-class Test {
-    val aNumberField = 0
-    
-    fun print() {
-        println("Time in millis: ${System.currentTimeMills()}")
+    injectMethod<Test>("Test", "main", "()V") { // this: Test ->
+        println("Injecting before the first instruction in Test#main!")
     }
 }
 ```
 
-**Using the Injector class**
+**For a full example, check out
+the [example project](https://github.com/cbyrneee/Injector/tree/main/example/src/main/kotlin/example)**
 
-```kt
-Injector.inject("dev/cbyrne/example/Test", "print", "()V", InjectPosition.BeforeAll) {
-    println("Hello World!")
-}
+## Contributing
 
-Injector.inject("dev/cbyrne/example/Test", "print", "()V", InjectPosition.BeforeReturn) {
-    println("Goodbye World!")
-}
-```
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-**Using the Kotlin DSL (more powerful)**
+Please update the example project if making a major change.
 
-```kt
-injectMethod("dev/cbyrne/example/Test", "print", "()V") {
-    println("Hello World!")
-}
+## License
 
-injectMethod("dev/cbyrne/example/Test", "print", "()V", beforeReturn) {
-    println("Goodbye World!")
-}
-```
-
-You can even access fields and methods from your target class via Injector!
-
-```kt
-injectMethod<Test>("dev/cbyrne/example/Test", "print", "()V") { // this: Test
-    println("Here, have a field from the target class: $aNumberField")
-}
-```
-
-If you want to insert after or before an invocation of a certain method, you can also do that!
-
-```kt
-injectMethod("dev/cbyrne/example/Test", "print", "()V", afterInvoke("java/io/PrintStream", "println", "(Ljava/lang/Object;)V")) {
-    println("After println!")
-}
-
-// You can also reference the method without typing out the descriptor and owner fully!
-injectMethod("dev/cbyrne/example/Test", "print", "()V", afterInvoke(System::currentTimeMillis)) {
-    println("After currentTimeMillis!")
-}
-```
-
-**Example Injector Output**
-
-When your class is modified at runtime using the injectors above, this is a simplified version of what it will look like
-in Kotlin code.
-
-If you're wondering why the methods seem to be "out of order" that's because the name follows the
-format``injectorMethod{x}``. ``x`` is the array index of the injector, this is **not class specific** and **not in order
-of injection point**.
-
-```kt
-class Test {
-    val aNumberField = 0
-    
-    fun print() {
-        // Anything starting with injectorMethod{x} 
-        // is an injector reference
-        injectorMethod0()
-        injectorMethod2()
-
-        // Note: currentTimeMillis is not stored in a val, 
-        // this is just easier for illustration purposes
-        val currentTimeMillis = System.currentTimeMills()
-        injectorMethod4()
-
-        println("Time in millis: ${currentTimeMillis}")
-        injectorMethod3()
-        injectorMethod1()
-    }
-    
-    fun injectorMethod0() {
-        println("Hello World!")
-    }
-    
-    fun injectorMethod1() {
-        println("Goodbye World!")
-    }
-    
-    fun injectorMethod2() {
-        println("Here, have a field from the target class: $aNumberField")
-    }
-    
-    fun injectorMethod3() {
-        println("After println!")
-    }
-    
-    fun injectorMethod4() {
-        println("After currentTimeMillis!")
-    } 
-}
-```
-
-### Other Injector Features
-
-**Accessing parameters from the target method**
-
-With Injector, you can access the parameters of the target method when injecting.
-
-*Note: If you attempt to change a parameter, it will not change them in the target method*
-
-``Calculator.kt``
-
-```kt
-class Calculator {
-    fun add(a: Int, b: Int): Int {
-        return a + b
-    }
-}
-```
-
-``EntryPoint.kt``
-
-```kt
-fun main(args: Array<String>) {
-    // Injector setup omitted, see the previous section
-    
-    injectMethod<Calculator>(
-        "Calculator", 
-        "add", 
-        descriptor(int, int, int)
-    ) { (params, _) -> // this: Calculator
-        val a = params.getOrNull(0) as? Int ?: return
-        val b = params.getOrNull(1) as? Int ?: return
-        
-        println("Adding $a and $b!")
-    }
-    
-    Calculator.add(1, 1)
-}
-```
-
-Simplified output of ``Calculator.kt``
-
-*Note: ``listOf`` is not actually called like this, it's just a simplification to make this easy to read, but the
-concept is the same*
-
-```kt
-class Calculator {
-    fun add(a: Int, b: Int): Int {
-        injectorMethod0(listOf(a, b))
-        return a + b
-    }
-    
-    fun injectorMethod0(params: List<Object>) {
-        val a = params.getOrNull(0) as? Int ?: return
-        val b = params.getOrNull(1) as? Int ?: return
-        
-        println("Adding $a and $b!")
-    }
-}
-```
-
-**Modifying return values**
-
-With Injector, you can also add a return instruction inside the target method. This means you can manipulate the return
-values of your target methods!
-
-Here, we will use the Calculator.kt class from the last example.
-
-``EntryPoint.kt``
-
-```kt
-fun main(args: Array<String>) {
-    // Injector setup omitted, see the previous section
-    injectMethod<Calculator>(
-        "Calculator", 
-        "add", 
-        descriptor(int, int, int)
-    ) { (params, returnInfo) -> // this: Calculator
-        val a = params.getOrNull(0) as? Int ?: return
-        val b = params.getOrNull(1) as? Int ?: return
-        
-        println("Adding $a and ${b * 2}!")
-        returnInfo.cancel(a + b * 2)
-    }
-    
-    Calculator.add(1, 1)
-}
-```
-
-Simplified output of ``Calculator.kt``
-
-```kt
-class Calculator {
-    fun add(a: Int, b: Int): Int {
-        val returnInfo: ReturnInfo
-        injectorMethod0(listOf(a, b), returnInfo)
-        
-        return returnInfo.returnValue // a + b * 2
-        
-        // The old instruction for return a + b is still here, just never reached
-        // return a + b
-    }
-    
-    fun injectorMethod0(params: List<Object>, returnInfo: ReturnInfo) {
-        val a = params.getOrNull(0) as? Int ?: return
-        val b = params.getOrNull(1) as? Int ?: return
-        
-        println("Adding $a and ${(b * 2)}!")
-        returnInfo.cancel(a + (b * 2))
-    }
-}
-```
-
-## Credits
-- [LlamaLad7](https://github.com/LlamaLad7) assisting with the development of this project
-
+[GPL 3.0](https://choosealicense.com/licenses/gpl-3.0/)
