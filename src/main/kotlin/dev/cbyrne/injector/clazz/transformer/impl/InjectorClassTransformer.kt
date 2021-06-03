@@ -37,7 +37,7 @@ import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodInsnNode
 import java.lang.reflect.Modifier
 
-class InjectorClassTransformer : IClassTransformer {
+class InjectorClassTransformer(private val debug: Boolean = false) : IClassTransformer {
     /**
      * Adds any Injector references in methods when required
      *
@@ -69,7 +69,7 @@ class InjectorClassTransformer : IClassTransformer {
             // Get a method for our injector, if none exists, go to the next entry
             val method = classNode.methods.firstOrNull { it.name == injector.method && it.desc == injector.descriptor }
                 ?: return@forEach
-            println("[InjectorClassTransformer] Applying injector for ${classNode.name}#${method.name}")
+            if (debug) println("[InjectorClassTransformer] Applying injector for ${classNode.name}#${method.name}")
 
             // Read the Unit's class
             val codeClassNode = ClassNode()
