@@ -136,10 +136,13 @@ class InjectorClassTransformer(private val debug: Boolean = false) : IClassTrans
 
                 classNode.fields.forEach { field ->
                     aload(fieldsMapSlot)
-
                     ldc(field.name)
-                    aload(0)
-                    getfield(classNode.name, field)
+                    if ((field.access and Opcodes.ACC_STATIC) != 0) {
+                        getstatic(classNode.name, field)
+                    } else {
+                        aload(0)
+                        getfield(classNode.name, field)
+                    }
                     instructions.add(primitiveConversionInsnList(Type.getType(field.desc)))
 
                     invokeinterface(
