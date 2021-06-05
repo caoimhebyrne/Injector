@@ -42,8 +42,9 @@ fun run() {
     val classLoader = Thread.currentThread().contextClassLoader as InjectorClassLoader
     classLoader.addTransformer(InjectorClassTransformer())
        
-    injectMethod<Test>("Test", "main", "()V") { // this: Test ->
-        println("Injecting before the first instruction in Test#main!")
+    injectMethod<Test>("Test", "main", "()V") { (params, fields, returnInfo) -> // this: Test ->
+        println("Injecting before the first instruction in Test#main and returning!")
+        returnInfo.cancel()
     }
 }
 ```
