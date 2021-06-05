@@ -89,6 +89,7 @@ class InjectorExample {
 
             println("[InjectorExample] I can access a public field: \'$aField\'")
             println("[InjectorExample] I can also access private field: \'$privateField\'")
+            println("[InjectorExample] Here is all of the fields in TargetClass: $fields")
         }
 
         // Changing the return value of a method

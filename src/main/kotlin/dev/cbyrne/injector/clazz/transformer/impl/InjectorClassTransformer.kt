@@ -140,6 +140,7 @@ class InjectorClassTransformer(private val debug: Boolean = false) : IClassTrans
                     ldc(field.name)
                     aload(0)
                     getfield(classNode.name, field)
+                    instructions.add(primitiveConversionInsnList(Type.getType(field.desc)))
 
                     invokeinterface(
                         java.util.Map::class,
@@ -338,6 +339,36 @@ class InjectorClassTransformer(private val debug: Boolean = false) : IClassTrans
                 }
                 Type.OBJECT -> aload(index)
                 Type.ARRAY -> aload(index)
+            }
+        }.first
+
+    private fun primitiveConversionInsnList(type: Type): InsnList =
+        assembleBlock {
+            when (type.sort) {
+                Type.INT -> {
+                    invokestatic(java.lang.Integer::class, "valueOf", java.lang.Integer::class, int)
+                }
+                Type.FLOAT -> {
+                    invokestatic(java.lang.Float::class, "valueOf", java.lang.Float::class, float)
+                }
+                Type.LONG -> {
+                    invokestatic(java.lang.Long::class, "valueOf", java.lang.Long::class, long)
+                }
+                Type.DOUBLE -> {
+                    invokestatic(java.lang.Double::class, "valueOf", java.lang.Double::class, double)
+                }
+                Type.BOOLEAN -> {
+                    invokestatic(java.lang.Boolean::class, "valueOf", java.lang.Boolean::class, boolean)
+                }
+                Type.SHORT -> {
+                    invokestatic(java.lang.Short::class, "valueOf", java.lang.Short::class, short)
+                }
+                Type.BYTE -> {
+                    invokestatic(java.lang.Byte::class, "valueOf", java.lang.Byte::class, byte)
+                }
+                Type.CHAR -> {
+                    invokestatic(java.lang.Character::class, "valueOf", java.lang.Character::class, char)
+                }
             }
         }.first
 }
