@@ -84,64 +84,104 @@ class InjectorClassTransformer(private val debug: Boolean = false) : IClassTrans
 
             // Make an insnList to invoke our injector method
             val (insnList) = assembleBlock {
-                // The previous local type and offset
-                var previousType: Type? = null
-                var previousOffset = 0
-
                 // Create a new array list and store it in the index of the last slot index + 1
-                val arraySlot = method.maxLocals + 1
+                val paramsArraySlot = method.maxLocals + 1
+                val fieldsMapSlot = paramsArraySlot + 1
+                val returnInfoSlot = fieldsMapSlot + 1
+                val injectorParamsSlot = returnInfoSlot + 1
+
                 val isStatic = if (Modifier.isStatic(method.access)) 0 else 1
 
                 // Create a new array list
                 new(ArrayList::class)
                 dup
                 invokespecial(ArrayList::class, "<init>", void)
-                astore(arraySlot)
+                astore(paramsArraySlot)
+
+                // Create a new hashmap for the fields in this class
+                new(HashMap::class)
+                dup
+                invokespecial(HashMap::class, "<init>", void)
+                astore(fieldsMapSlot)
 
                 // Add all parameters to the array
                 // NOTE: This is done on each injectorMethod{x} call as they can change during the method execution
+                // The previous local type and offset
+                var previousParameterType: Type? = null
+                var previousParameterOffset = 0
                 Type.getArgumentTypes(method.desc).forEachIndexed { index, type ->
                     // Load the array list
-                    aload(arraySlot)
+                    aload(paramsArraySlot)
 
                     // Add 1 to the slot if it's a long or a double, these take up 2 slots so we should offset it by 1
-                    val offset = if (previousType?.sort == Type.LONG || previousType?.sort == Type.DOUBLE) 1 else 0
+                    val offset =
+                        if (previousParameterType?.sort == Type.LONG || previousParameterType?.sort == Type.DOUBLE) 1 else 0
 
                     // Load the next parameter and convert it to a non-primitive if required
-                    instructions.add(primitiveConversionInsnList(index + isStatic + offset + previousOffset, type))
+                    instructions.add(
+                        primitiveConversionInsnList(
+                            index + isStatic + offset + previousParameterOffset,
+                            type
+                        )
+                    )
 
                     // Add the parameter to the list
                     invokevirtual(java.util.ArrayList::class, "add", boolean, java.lang.Object::class)
                     pop
 
                     // Store the previous type and offset
-                    previousType = type
-                    previousOffset = offset
+                    previousParameterType = type
+                    previousParameterOffset = offset
+                }
+
+                classNode.fields.forEach { field ->
+                    aload(fieldsMapSlot)
+
+                    ldc(field.name)
+                    aload(0)
+                    getfield(classNode.name, field)
+
+                    invokeinterface(
+                        java.util.Map::class,
+                        "put",
+                        java.lang.Object::class,
+                        java.lang.Object::class,
+                        java.lang.Object::class
+                    )
+                    pop
                 }
 
                 // val returnInfo = MethodInjector.returnInfo()
                 new(MethodInjector.ReturnInfo::class)
                 dup
                 invokespecial(MethodInjector.ReturnInfo::class, "<init>", void)
-                astore(arraySlot + 1)
+                astore(returnInfoSlot)
 
-                // val params = InjectorParams(array, returnInfo)
+                // val params = InjectorParams(array, returnInfo, hashMap)
                 new(InjectorParams::class)
                 dup
-                aload(arraySlot)
-                aload(arraySlot + 1)
-                invokespecial(InjectorParams::class, "<init>", void, List::class, MethodInjector.ReturnInfo::class)
-                astore(arraySlot + 2)
+                aload(paramsArraySlot)
+                aload(fieldsMapSlot)
+                aload(returnInfoSlot)
+                invokespecial(
+                    InjectorParams::class,
+                    "<init>",
+                    void,
+                    List::class,
+                    HashMap::class,
+                    MethodInjector.ReturnInfo::class
+                )
+                astore(injectorParamsSlot)
 
                 // Call the injectorMethod{x} with the current class instance and parameter list
-                // injectorMethod0(this, returnInfo))
+                // injectorMethod0(this, injectorParams))
                 aload_0
                 dup
-                aload(arraySlot + 2)
+                aload(injectorParamsSlot)
                 invokevirtual(classNode.name, injectorMethodName, invokeMethod.desc)
 
                 // Go to the label retIfTrue if the method was cancelled
-                aload(arraySlot + 1)
+                aload(returnInfoSlot)
                 invokevirtual(MethodInjector.ReturnInfo::class, "getCancelled", boolean)
                 ifeq(L["retIfTrue"])
 
@@ -156,7 +196,7 @@ class InjectorClassTransformer(private val debug: Boolean = false) : IClassTrans
                     _return
                 } else {
                     // If the method returns a value, get the return value provided by the Injector, cast it then return it
-                    aload(arraySlot + 1)
+                    aload(returnInfoSlot)
                     invokevirtual(MethodInjector.ReturnInfo::class, "getReturnValue", Any::class)
                     instructions.add(returnInstructionForType(methodReturnType))
                 }

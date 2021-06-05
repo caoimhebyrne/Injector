@@ -19,7 +19,8 @@
 package example
 
 class TargetClass {
-    val aField = "\"this is a field from TargetClass, how cool!\""
+    val aField = "this is a field from TargetClass, how cool!"
+    private val privateField = "this is a private field wow..."
 
     fun print(
         parameter: String,

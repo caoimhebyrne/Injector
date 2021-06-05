@@ -29,6 +29,7 @@ import dev.cbyrne.injector.dsl.beforeReturn
 import dev.cbyrne.injector.dsl.descriptor
 import dev.cbyrne.injector.dsl.injectMethod
 import dev.cbyrne.injector.position.InjectPosition
+import dev.cbyrne.injector.util.getOrError
 
 /**
  * Called from EntryPoint.kt
@@ -83,8 +84,11 @@ class InjectorExample {
             "print",
             methodDesc,
             beforeReturn
-        ) {
-            println("[InjectorExample] Before return using DSL! I can access a field, like $aField")
+        ) { (_, fields, _) ->
+            val privateField = fields.getOrError("privateField")
+
+            println("[InjectorExample] I can access a public field: \'$aField\'")
+            println("[InjectorExample] I can also access private field: \'$privateField\'")
         }
 
         // Changing the return value of a method
@@ -92,7 +96,7 @@ class InjectorExample {
             "example/TargetClass",
             "returnTrue",
             descriptor(boolean)
-        ) { (_, returnInfo) ->
+        ) { (_, _, returnInfo) ->
             println("[InjectorExample] Overriding return value with false!")
             returnInfo.cancel(false)
         }
@@ -102,7 +106,7 @@ class InjectorExample {
             "example/TargetClass",
             "nonPrimitive",
             descriptor(String::class)
-        ) { (_, returnInfo) ->
+        ) { (_, _, returnInfo) ->
             println("[InjectorExample] Overriding return value with custom string!")
             returnInfo.cancel("hello world, it has been overridden")
         }
@@ -112,7 +116,7 @@ class InjectorExample {
             "example/TargetClass",
             "arrayTesting",
             descriptor(List::class)
-        ) { (_, returnInfo) ->
+        ) { (_, _, returnInfo) ->
             println("[InjectorExample] Overriding return value with custom array!")
             returnInfo.cancel(listOf("oooh", 1, "wow"))
         }

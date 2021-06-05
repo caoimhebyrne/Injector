@@ -16,10 +16,6 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package dev.cbyrne.injector.provider
+package dev.cbyrne.injector.util
 
-data class InjectorParams(
-    val params: List<Any>,
-    val fields: HashMap<String, Any>,
-    val retInfo: MethodInjector.ReturnInfo
-)
+fun Map<*, *>.getOrError(key: String) = this[key] ?: error("Failed to get $key")
