@@ -86,6 +86,9 @@ dependencies {
             implementation("org.ow2.asm", module, ASM)
         }
 
+        implementation("fr.stardustenterprises", "unsafe", UNSAFE)
+        implementation("fr.stardustenterprises", "deface", DEFACE)
+
         implementation("codes.som.anthony", "koffee", KOFFEE) {
             exclude(group = "org.ow2.asm")
         }
