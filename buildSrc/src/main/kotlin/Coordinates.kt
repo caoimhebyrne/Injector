@@ -19,12 +19,12 @@
 object Coordinates {
     const val NAME = "injector"
     const val DESC = "A JVM library for modifying classes at runtime using ASM."
-    const val VENDOR = "Stardust Enterprises"
+    const val VENDOR = "cbyrneee"
 
     const val GIT_HOST = "github.com"
-    const val REPO_ID = "stardust-enterprises/$NAME"
+    const val REPO_ID = "cbyrneee/$NAME"
 
-    const val GROUP = "fr.stardustenterprises"
+    const val GROUP = "dev.cbyrne"
     const val VERSION = "1.1.0"
 }
 
