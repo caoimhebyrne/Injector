@@ -77,15 +77,18 @@ repositories {
 
 // Project Dependencies
 dependencies {
-    val include by configurations
-
     with(Dependencies) {
-        kotlinModules.forEach {
-            implementation("org.jetbrains.kotlin", "kotlin-$it", KOTLIN)
+        kotlinModules.forEach { module ->
+            implementation("org.jetbrains.kotlin", "kotlin-$module", KOTLIN)
         }
 
-        api("org.ow2.asm", "asm-commons", ASM)
-        implementation("codes.som.anthony", "koffee", KOFFEE)
+        arrayOf("asm", "asm-tree").forEach { module ->
+            implementation("org.ow2.asm", module, ASM)
+        }
+
+        implementation("codes.som.anthony", "koffee", KOFFEE) {
+            exclude(group = "org.ow2.asm")
+        }
     }
 }
 
