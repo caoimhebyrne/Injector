@@ -16,11 +16,27 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-rootProject.name = "injector"
+object Coordinates {
+    const val NAME = "injector"
+    const val DESC = "A JVM library for modifying classes at runtime using ASM."
+    const val VENDOR = "Stardust Enterprises"
 
-pluginManagement.repositories {
-    mavenLocal()
-    gradlePluginPortal()
+    const val GIT_HOST = "github.com"
+    const val REPO_ID = "stardust-enterprises/$NAME"
+
+    const val GROUP = "fr.stardustenterprises"
+    const val VERSION = "1.1.0"
 }
 
-include("example")
+object Pom {
+    val licenses = arrayOf(
+        License("GPL-3.0", "https://opensource.org/licenses/GPL-3.0")
+    )
+    val developers = arrayOf(
+        Developer("cbyrneee"),
+        Developer("xtrm"),
+    )
+}
+
+data class License(val name: String, val url: String, val distribution: String = "repo")
+data class Developer(val id: String, val name: String = id)
