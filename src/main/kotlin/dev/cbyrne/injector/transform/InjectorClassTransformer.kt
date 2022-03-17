@@ -176,8 +176,8 @@ object InjectorClassTransformer : IClassTransformer {
         val hookContainerClass = assembleClass(
             public,
             "$INJECTOR_NAMESPACE/${classNode.name}" +
-                    "_Hook_" +
-                    hookContainerIndex,
+                "_Hook_" +
+                hookContainerIndex,
             Opcodes.V1_8
         ) {}
         hookContainerIndex++
@@ -196,8 +196,8 @@ object InjectorClassTransformer : IClassTransformer {
             if (debug) {
                 println(
                     "[InjectorClassTransformer] Applying injector for " +
-                            "${classNode.name}.${method.name}${method.desc}" +
-                            " @ ${injector.position}"
+                        "${classNode.name}.${method.name}${method.desc}" +
+                        " @ ${injector.position}"
                 )
             }
 
@@ -209,12 +209,12 @@ object InjectorClassTransformer : IClassTransformer {
             // Take the bytecode from Unit#invoke
             // and write it to our own function
             val invokeMethod = codeNode.methods.first {
-                it.name == "invoke"
-                        && (it.access and Opcodes.ACC_SYNTHETIC == 0)
+                it.name == "invoke" &&
+                    (it.access and Opcodes.ACC_SYNTHETIC == 0)
             }
 
             val injectorMethodName = "injector\$method" +
-                    methodInjectors.indexOf(injector)
+                methodInjectors.indexOf(injector)
 
             val insns = InsnList()
             invokeMethod.instructions.map {
@@ -268,8 +268,8 @@ object InjectorClassTransformer : IClassTransformer {
                         // Add 1 to the slot if it's a long or a double,
                         // these take up 2 slots, so we should offset it by 1
                         val offset =
-                            if (previousParameterType?.sort == Type.LONG
-                                || previousParameterType?.sort == Type.DOUBLE
+                            if (previousParameterType?.sort == Type.LONG ||
+                                previousParameterType?.sort == Type.DOUBLE
                             ) 1
                             else 0
 
@@ -278,9 +278,9 @@ object InjectorClassTransformer : IClassTransformer {
                         instructions.add(
                             primitiveConversionInsnList(
                                 index +
-                                        isStatic +
-                                        offset +
-                                        previousParameterOffset,
+                                    isStatic +
+                                    offset +
+                                    previousParameterOffset,
                                 type
                             )
                         )
@@ -407,9 +407,9 @@ object InjectorClassTransformer : IClassTransformer {
                     val targetInstruction = method.instructions
                         .filterIsInstance<MethodInsnNode>()
                         .first {
-                            it.name == pos.name
-                                    && it.desc == pos.descriptor
-                                    && it.owner == pos.owner
+                            it.name == pos.name &&
+                                it.desc == pos.descriptor &&
+                                it.owner == pos.owner
                         }
 
                     when (pos.position) {
@@ -428,7 +428,7 @@ object InjectorClassTransformer : IClassTransformer {
             }
         }
 
-        if(hookUsed) {
+        if (hookUsed) {
             defineClass(hookContainerClass, classLoader = classLoader)
         }
 

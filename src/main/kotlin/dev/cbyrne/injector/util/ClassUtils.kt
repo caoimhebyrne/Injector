@@ -37,7 +37,10 @@ fun Class<*>.readBytes(): ByteArray {
  * Adapted from [https://github.com/videogame-hacker/Koffee]
  */
 fun ClassNode.addMethod(
-    access: Modifiers, name: String, desc: String, instructions: InsnList? = null,
+    access: Modifiers,
+    name: String,
+    desc: String,
+    instructions: InsnList? = null,
     routine: (MethodAssembly.() -> Unit)? = null
 ) {
     val methodNode = MethodNode()

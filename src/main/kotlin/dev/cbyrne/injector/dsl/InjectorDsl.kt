@@ -38,17 +38,21 @@ fun beforeInvoke(className: String, methodName: String, descriptor: String) =
 
 fun beforeInvoke(method: KFunction<*>): InjectPosition.Invoke {
     val javaMethod = method.javaMethod ?: error("Failed to get javaMethod of $method")
-    return InjectPosition.Invoke(javaMethod.declaringClass.name.replace(".", "/"),
+    return InjectPosition.Invoke(
+        javaMethod.declaringClass.name.replace(".", "/"),
         method.name,
-        Type.getMethodDescriptor(javaMethod))
+        Type.getMethodDescriptor(javaMethod)
+    )
 }
 
 fun afterInvoke(method: KFunction<*>): InjectPosition.Invoke {
     val javaMethod = method.javaMethod ?: error("Failed to get javaMethod of $method")
-    return InjectPosition.Invoke(javaMethod.declaringClass.name.replace(".", "/"),
+    return InjectPosition.Invoke(
+        javaMethod.declaringClass.name.replace(".", "/"),
         method.name,
         Type.getMethodDescriptor(javaMethod),
-        InjectPosition.InvokePosition.AFTER)
+        InjectPosition.InvokePosition.AFTER
+    )
 }
 
 fun descriptor(returnType: TypeLike, vararg parameterTypes: TypeLike): String =
@@ -61,7 +65,6 @@ fun <T> injectMethod(
     position: InjectPosition = InjectPosition.BeforeAll,
     code: T.(InjectorParams) -> Unit,
 ) = Injector.inject(className, methodName, descriptor, position, code)
-
 
 @JvmName("injectMethodNonTyped")
 fun injectMethod(
