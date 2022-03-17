@@ -37,8 +37,9 @@ import kotlin.jvm.functions.Function2;
 public class InjectorExample {
     // We cannot use lambda expressions when
     // declaring hooks in Java.
+    // Also no Convert2Diamond because Java 8 support.
     public static void main(String[] args) {
-        //noinspection Convert2Lambda
+        //noinspection Convert2Lambda,Convert2Diamond
         Injector.inject(
                 "example/TargetClass",
                 "print",
@@ -46,7 +47,7 @@ public class InjectorExample {
                 InjectPosition.BeforeAll.INSTANCE,
                 false,
                 false,
-                new Function2<>() {
+                new Function2<Object, InjectorParams, Unit>() {
                     @Override
                     public Unit invoke(Object instance, InjectorParams injectorParams) {
                         System.out.println("[InjectorExample] Before all");
@@ -55,7 +56,7 @@ public class InjectorExample {
                 }
         );
 
-        //noinspection Convert2Lambda
+        //noinspection Convert2Lambda,Convert2Diamond
         Injector.inject(
                 "example/TargetClass",
                 "print",
@@ -63,7 +64,7 @@ public class InjectorExample {
                 InjectPosition.BeforeTail.INSTANCE,
                 false,
                 false,
-                new Function2<>() {
+                new Function2<Object, InjectorParams, Unit>() {
                     @Override
                     public Unit invoke(Object instance, InjectorParams injectorParams) {
                         System.out.println("[InjectorExample] Before tail");

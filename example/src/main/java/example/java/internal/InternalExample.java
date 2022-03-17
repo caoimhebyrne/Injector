@@ -45,15 +45,15 @@ import java.net.URLStreamHandler;
  */
 public class InternalExample {
     public static void main(String[] args) throws MalformedURLException {
-        //noinspection Convert2Lambda
-        Injector.<URL>inject(
+        // noinspection Convert2Lambda
+        Injector.inject(
                 "java/net/URL",
                 "<init>",
                 InjectorDslKt.descriptor(Type.VOID_TYPE, URL.class, String.class, URLStreamHandler.class),
                 InjectPosition.BeforeAll.INSTANCE,
                 true,
                 false,
-                new Function2<>() {
+                new Function2<URL, InjectorParams, Unit>() {
                     @Override
                     public Unit invoke(URL instance, InjectorParams injectorParams) {
                         System.out.println("URL Created: " + injectorParams.getParams().get(1));
