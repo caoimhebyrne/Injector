@@ -26,14 +26,4 @@ data class MethodInjector<Any>(
     val descriptor: String,
     val position: InjectPosition,
     val code: Any.(InjectorParams) -> Unit
-) {
-    data class ReturnInfo(
-        var cancelled: Boolean = false,
-        var returnValue: Any? = null
-    ) {
-        fun cancel(returnValue: Any? = null) {
-            this.cancelled = true
-            this.returnValue = returnValue
-        }
-    }
-}
+)

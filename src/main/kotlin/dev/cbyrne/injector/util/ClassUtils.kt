@@ -20,7 +20,7 @@ package dev.cbyrne.injector.util
 
 import codes.som.anthony.koffee.MethodAssembly
 import codes.som.anthony.koffee.modifiers.Modifiers
-import dev.cbyrne.injector.clazz.transformer.impl.InjectorClassTransformer
+import dev.cbyrne.injector.transform.InjectorClassTransformer
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode

@@ -78,19 +78,19 @@ repositories {
 // Project Dependencies
 dependencies {
     with(Dependencies) {
-        kotlinModules.forEach { module ->
-            implementation("org.jetbrains.kotlin", "kotlin-$module", KOTLIN)
-        }
+        implementation("org.jetbrains.kotlin", "kotlin-stdlib", KOTLIN)
+        api("org.jetbrains.kotlin", "kotlin-reflect", KOTLIN)
 
         arrayOf("asm", "asm-tree").forEach { module ->
-            implementation("org.ow2.asm", module, ASM)
+            api("org.ow2.asm", module, ASM)
         }
 
         implementation("fr.stardustenterprises", "unsafe", UNSAFE)
         implementation("fr.stardustenterprises", "deface", DEFACE)
 
-        implementation("codes.som.anthony", "koffee", KOFFEE) {
+        api("codes.som.anthony", "koffee", KOFFEE) {
             exclude(group = "org.ow2.asm")
+            exclude(group = "org.jetbrains.kotlin")
         }
     }
 }

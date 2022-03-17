@@ -23,7 +23,6 @@ import codes.som.anthony.koffee.types.coerceType
 import dev.cbyrne.injector.Injector
 import dev.cbyrne.injector.position.InjectPosition
 import dev.cbyrne.injector.provider.InjectorParams
-import dev.cbyrne.injector.provider.MethodInjector
 import org.objectweb.asm.Type
 import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
@@ -39,21 +38,17 @@ fun beforeInvoke(className: String, methodName: String, descriptor: String) =
 
 fun beforeInvoke(method: KFunction<*>): InjectPosition.Invoke {
     val javaMethod = method.javaMethod ?: error("Failed to get javaMethod of $method")
-    return InjectPosition.Invoke(
-        javaMethod.declaringClass.name.replace(".", "/"),
+    return InjectPosition.Invoke(javaMethod.declaringClass.name.replace(".", "/"),
         method.name,
-        Type.getMethodDescriptor(javaMethod)
-    )
+        Type.getMethodDescriptor(javaMethod))
 }
 
 fun afterInvoke(method: KFunction<*>): InjectPosition.Invoke {
     val javaMethod = method.javaMethod ?: error("Failed to get javaMethod of $method")
-    return InjectPosition.Invoke(
-        javaMethod.declaringClass.name.replace(".", "/"),
+    return InjectPosition.Invoke(javaMethod.declaringClass.name.replace(".", "/"),
         method.name,
         Type.getMethodDescriptor(javaMethod),
-        InjectPosition.InvokePosition.AFTER
-    )
+        InjectPosition.InvokePosition.AFTER)
 }
 
 fun descriptor(returnType: TypeLike, vararg parameterTypes: TypeLike): String =
@@ -64,18 +59,9 @@ fun <T> injectMethod(
     methodName: String,
     descriptor: String,
     position: InjectPosition = InjectPosition.BeforeAll,
-    code: T.(InjectorParams) -> Unit
-) {
-    Injector.methodInjectors.add(
-        MethodInjector(
-            className,
-            methodName,
-            descriptor,
-            position,
-            code
-        )
-    )
-}
+    code: T.(InjectorParams) -> Unit,
+) = Injector.inject(className, methodName, descriptor, position, code)
+
 
 @JvmName("injectMethodNonTyped")
 fun injectMethod(
@@ -83,15 +69,5 @@ fun injectMethod(
     methodName: String,
     descriptor: String,
     position: InjectPosition = InjectPosition.BeforeAll,
-    code: Any.(InjectorParams) -> Unit
-) {
-    Injector.methodInjectors.add(
-        MethodInjector(
-            className,
-            methodName,
-            descriptor,
-            position,
-            code
-        )
-    )
-}
+    code: Any.(InjectorParams) -> Unit,
+) = Injector.inject(className, methodName, descriptor, position, code)

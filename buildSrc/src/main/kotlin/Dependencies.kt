@@ -34,8 +34,6 @@ object Dependencies {
     const val UNSAFE = "1.7.2"
     const val DEFACE = "0.2.0"
     const val KOFFEE = "8.0.2"
-
-    val kotlinModules = arrayOf("stdlib", "reflect")
 }
 
 object Repositories {

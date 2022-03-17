@@ -21,9 +21,39 @@ package dev.cbyrne.injector
 import dev.cbyrne.injector.position.InjectPosition
 import dev.cbyrne.injector.provider.InjectorParams
 import dev.cbyrne.injector.provider.MethodInjector
+import dev.cbyrne.injector.transform.InjectorClassTransformer
+import fr.stardustenterprises.deface.engine.NativeTransformationService
+import net.gudenau.lib.unsafe.Unsafe
+import java.util.function.BiConsumer
 
 object Injector {
-    val methodInjectors = mutableListOf<MethodInjector<*>>()
+    init {
+        arrayOf("ReturnInfo", "InjectorParams").forEach { className ->
+            ensureLoaded("dev/cbyrne/injector/provider/$className")
+        }
+
+        // Initialize the service
+        NativeTransformationService.addTransformers(InjectorClassTransformer)
+    }
+
+    /**
+     * Ensures that the class is force loaded on the bootstrap [ClassLoader]
+     */
+    private fun ensureLoaded(className: String) {
+        val classBytes = Injector::class.java.getResourceAsStream(
+            "/$className.class"
+        )?.readBytes()
+            ?: throw RuntimeException("Couldn't find $className.class")
+
+        Unsafe.defineClass<Any>(
+            className,
+            classBytes,
+            0,
+            classBytes.size,
+            null,
+            null
+        )
+    }
 
     @JvmStatic
     fun <T> inject(
@@ -31,9 +61,28 @@ object Injector {
         method: String,
         descriptor: String,
         position: InjectPosition = InjectPosition.BeforeAll,
-        code: T.(InjectorParams) -> Unit
-    ) {
-        methodInjectors.add(MethodInjector(className.replace(".", "/"), method, descriptor, position, code))
+        code: T.(InjectorParams) -> Unit,
+    ) = directInject(className, method, descriptor, position, code)
+
+    @JvmStatic
+    @JvmName("injectNonTyped")
+    fun inject(
+        className: String,
+        method: String,
+        descriptor: String,
+        position: InjectPosition = InjectPosition.BeforeAll,
+        code: Any.(InjectorParams) -> Unit,
+    ) = directInject(className, method, descriptor, position, code)
+
+    @JvmStatic
+    fun <T> inject(
+        className: String,
+        method: String,
+        descriptor: String,
+        position: InjectPosition = InjectPosition.BeforeAll,
+        consumer: BiConsumer<T, InjectorParams>,
+    ) = directInject<T>(className, method, descriptor, position) { params ->
+        consumer.accept(this, params)
     }
 
     @JvmStatic
@@ -43,8 +92,24 @@ object Injector {
         method: String,
         descriptor: String,
         position: InjectPosition = InjectPosition.BeforeAll,
-        code: Any.(InjectorParams) -> Unit
+        consumer: BiConsumer<Any, InjectorParams>,
+    ) = directInject<Any>(className, method, descriptor, position) { params ->
+        consumer.accept(this, params)
+    }
+
+    private fun <T> directInject(
+        className: String,
+        method: String,
+        descriptor: String,
+        position: InjectPosition = InjectPosition.BeforeAll,
+        code: T.(InjectorParams) -> Unit
     ) {
-        methodInjectors.add(MethodInjector(className.replace(".", "/"), method, descriptor, position, code))
+        val newClassName = className.replace(".", "/")
+
+        val clazz = NativeTransformationService.findClass(newClassName)
+        Unsafe.ensureClassInitialized(clazz)
+
+        InjectorClassTransformer.methodInjectors.add(MethodInjector(newClassName, method, descriptor, position, code))
+        NativeTransformationService.retransformClasses(clazz)
     }
 }
