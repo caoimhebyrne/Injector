@@ -22,35 +22,21 @@ dependencies {
 
 ## Usage
 
-**EntryPoint.kt**
-
-```kotlin
-fun main(args: Array<String>) {
-    val classLoader = InjectorClassLoader()
-    Thread.currentThread().contextClassLoader = classLoader
-
-    // Example of invoking your class through the classloader
-    val clazz = classLoader.loadClass("Example")
-    clazz.getMethod("run").invoke(clazz.getDeclaredConstructor().newInstance())
-}
-```
-
 **Example.kt**
 
 ```kotlin
 fun run() {
-    val classLoader = Thread.currentThread().contextClassLoader as InjectorClassLoader
-    classLoader.addTransformer(InjectorClassTransformer())
-       
     injectMethod<Test>("Test", "main", "()V") { (params, fields, returnInfo) -> // this: Test ->
         println("Injecting before the first instruction in Test#main and returning!")
         returnInfo.cancel()
     }
+    
+    Test().main() // will simply return
 }
 ```
 
 **For a full example, check out
-the [example project](https://github.com/cbyrneee/Injector/tree/main/example/src/main/kotlin/example)**
+the [example project](https://github.com/cbyrneee/Injector/tree/main/example/src/main/kotlin/example/kotlin)**
 
 ## Contributing
 
