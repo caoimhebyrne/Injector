@@ -15,7 +15,6 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import plugins.ShadowJar
 import java.net.URL
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -28,12 +27,6 @@ plugins {
 
         // Git Repo Information
         id("org.ajoberstar.grgit") version GRGIT
-
-        // Token Replacement
-        id("net.kyori.blossom") version BLOSSOM
-
-        // Dependency Shading
-        id("com.github.johnrengelman.shadow") version SHADOW
 
         // Code Quality
         id("org.jlleitschuh.gradle.ktlint") version KTLINT
@@ -57,15 +50,6 @@ val targetVersion = "1.8"
 val sourceVersion = "1.8"
 // Should we generate an /api/ source set
 val apiSourceSet = false
-
-// Add `include` configuration for ShadowJar
-configurations {
-    val include by creating
-    // don't include in maven pom
-    compileOnly.get().extendsFrom(include)
-    // but also work in tests
-    testImplementation.get().extendsFrom(include)
-}
 
 // Maven Repositories
 repositories {
@@ -121,16 +105,6 @@ if (apiSourceSet) {
 // Disable unneeded rules
 ktlint {
     this.disabledRules.add("no-wildcard-imports")
-}
-
-blossom {
-    mapOf(
-        "project.name" to Coordinates.NAME,
-        "project.version" to Coordinates.VERSION,
-        "project.desc" to Coordinates.DESC,
-    ).mapKeys { "@${it.key}@" }.forEach { (key, value) ->
-        replaceToken(key, value)
-    }
 }
 
 tasks {
@@ -273,19 +247,6 @@ tasks {
 
         from("LICENSE")
     }
-
-    // Configure ShadowJar
-    shadowJar {
-        val include by project.configurations
-
-        this.configurations.clear()
-        this.configurations += include
-
-        this.archiveClassifier.set(if (ShadowJar.overrideJar) "" else "all")
-        this.manifest.inheritFrom(jar.get().manifest)
-
-        ShadowJar.packageRemappings.forEach(this::relocate)
-    }
 }
 
 // Define the default artifacts' tasks
@@ -301,7 +262,6 @@ val defaultArtifactTasks = arrayOf(
 // Declare the artifacts
 artifacts {
     defaultArtifactTasks.forEach(::archives)
-    archives(tasks.shadowJar)
 }
 
 publishing.publications {
