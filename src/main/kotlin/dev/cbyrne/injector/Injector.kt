@@ -60,8 +60,10 @@ object Injector {
         method: String,
         descriptor: String,
         position: InjectPosition = InjectPosition.BeforeAll,
+        catchLocals: Boolean = true,
+        catchFields: Boolean = true,
         code: T.(InjectorParams) -> Unit,
-    ) = directInject(className, method, descriptor, position, code)
+    ) = directInject(className, method, descriptor, position, catchLocals, catchFields, code)
 
     @JvmStatic
     @JvmName("injectNonTyped")
@@ -70,14 +72,18 @@ object Injector {
         method: String,
         descriptor: String,
         position: InjectPosition = InjectPosition.BeforeAll,
+        catchLocals: Boolean = true,
+        catchFields: Boolean = true,
         code: Any.(InjectorParams) -> Unit,
-    ) = directInject(className, method, descriptor, position, code)
+    ) = directInject(className, method, descriptor, position, catchLocals, catchFields, code)
 
     private fun <T> directInject(
         className: String,
         method: String,
         descriptor: String,
         position: InjectPosition = InjectPosition.BeforeAll,
+        catchLocals: Boolean = true,
+        catchFields: Boolean = true,
         code: T.(InjectorParams) -> Unit
     ) {
         val newClassName = className.replace(".", "/")
@@ -85,7 +91,7 @@ object Injector {
         val clazz = NativeTransformationService.findClass(newClassName)
         Unsafe.ensureClassInitialized(clazz)
 
-        InjectorClassTransformer.methodInjectors.add(MethodInjector(newClassName, method, descriptor, position, code))
+        InjectorClassTransformer.methodInjectors.add(MethodInjector(newClassName, method, descriptor, position, catchLocals, catchFields, code))
         NativeTransformationService.retransformClasses(clazz)
     }
 }

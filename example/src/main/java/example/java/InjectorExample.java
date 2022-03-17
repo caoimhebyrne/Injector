@@ -44,6 +44,8 @@ public class InjectorExample {
                 "print",
                 "(Ljava/lang/String;Ljava/lang/String;JJZ)V",
                 InjectPosition.BeforeAll.INSTANCE,
+                false,
+                false,
                 new Function2<>() {
                     @Override
                     public Unit invoke(Object instance, InjectorParams injectorParams) {
@@ -59,6 +61,8 @@ public class InjectorExample {
                 "print",
                 "(Ljava/lang/String;Ljava/lang/String;JJZ)V",
                 InjectPosition.BeforeTail.INSTANCE,
+                false,
+                false,
                 new Function2<>() {
                     @Override
                     public Unit invoke(Object instance, InjectorParams injectorParams) {

@@ -51,6 +51,8 @@ public class InternalExample {
                 "<init>",
                 InjectorDslKt.descriptor(Type.VOID_TYPE, URL.class, String.class, URLStreamHandler.class),
                 InjectPosition.BeforeAll.INSTANCE,
+                true,
+                false,
                 new Function2<>() {
                     @Override
                     public Unit invoke(URL instance, InjectorParams injectorParams) {

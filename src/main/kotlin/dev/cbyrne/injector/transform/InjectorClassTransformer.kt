@@ -175,8 +175,8 @@ object InjectorClassTransformer : IClassTransformer {
         val hookContainerClass = assembleClass(
             public,
             "$INJECTOR_NAMESPACE/${classNode.name}" +
-                "_Hook_" +
-                hookContainerIndex,
+                    "_Hook_" +
+                    hookContainerIndex,
             Opcodes.V1_8
         ) {}
 
@@ -194,8 +194,8 @@ object InjectorClassTransformer : IClassTransformer {
             if (debug) {
                 println(
                     "[InjectorClassTransformer] Applying injector for " +
-                        "${classNode.name}.${method.name}${method.desc}" +
-                        " @ ${injector.position}"
+                            "${classNode.name}.${method.name}${method.desc}" +
+                            " @ ${injector.position}"
                 )
             }
 
@@ -208,11 +208,11 @@ object InjectorClassTransformer : IClassTransformer {
             // and write it to our own function
             val invokeMethod = codeNode.methods.first {
                 it.name == "invoke" &&
-                    (it.access and Opcodes.ACC_SYNTHETIC == 0)
+                        (it.access and Opcodes.ACC_SYNTHETIC == 0)
             }
 
             val injectorMethodName = "injector\$method" +
-                methodInjectors.indexOf(injector)
+                    methodInjectors.indexOf(injector)
 
             // "Normalize" instructions, decrement the stack pointer,
             // and remove `return Unit`
@@ -243,17 +243,16 @@ object InjectorClassTransformer : IClassTransformer {
                 insns
             )
 
-            // Make an insnList to invoke our injector method
-            val (insnList) = assembleBlock {
-                // Create a new array list and store it
-                // in the index of the last slot index + 1
-                val paramsArraySlot = method.maxLocals + 1
-                val fieldsMapSlot = paramsArraySlot + 1
-                val returnInfoSlot = fieldsMapSlot + 1
-                val injectorParamsSlot = returnInfoSlot + 1
+            // Create a new array list and store it
+            // in the index of the last slot index + 1
+            val paramsArraySlot = method.maxLocals + 1
+            val fieldsMapSlot = paramsArraySlot + 1
+            val returnInfoSlot = fieldsMapSlot + 1
+            val injectorParamsSlot = returnInfoSlot + 1
 
-                val isStatic = if (Modifier.isStatic(method.access)) 0 else 1
+            val isStatic = if (Modifier.isStatic(method.access)) 0 else 1
 
+            val (createVars) = assembleBlock {
                 // Create a new array list
                 new(ArrayList::class)
                 dup
@@ -265,7 +264,9 @@ object InjectorClassTransformer : IClassTransformer {
                 dup
                 invokespecial(HashMap::class, "<init>", void)
                 astore(fieldsMapSlot)
+            }
 
+            val (catchLocals) = assembleBlock {
                 // Add all parameters to the array
                 // NOTE: This is done on each injectorMethod{x} call as
                 // they can change during the method execution
@@ -290,9 +291,9 @@ object InjectorClassTransformer : IClassTransformer {
                         instructions.add(
                             primitiveConversionInsnList(
                                 index +
-                                    isStatic +
-                                    offset +
-                                    previousParameterOffset,
+                                        isStatic +
+                                        offset +
+                                        previousParameterOffset,
                                 type
                             )
                         )
@@ -310,7 +311,9 @@ object InjectorClassTransformer : IClassTransformer {
                         previousParameterType = type
                         previousParameterOffset = offset
                     }
+            }
 
+            val (catchFields) = assembleBlock {
                 classNode.fields.forEach { field ->
                     aload(fieldsMapSlot)
                     ldc(field.name)
@@ -333,7 +336,10 @@ object InjectorClassTransformer : IClassTransformer {
                     )
                     pop
                 }
+            }
 
+            // Make an insnList to invoke our injector method
+            val (makeCall) = assembleBlock {
                 // val returnInfo = ReturnInfo()
                 new(ReturnInfo::class.java)
                 dup
@@ -401,16 +407,27 @@ object InjectorClassTransformer : IClassTransformer {
                 +L["retIfTrue"]
             }
 
+            val finalList = InsnList().also {
+                it.add(createVars)
+                if (injector.catchLocals) {
+                    it.add(catchLocals)
+                }
+                if (injector.catchFields) {
+                    it.add(catchFields)
+                }
+                it.add(makeCall)
+            }
+
             // Invoke our injector method at the specified position
             when (injector.position::class) {
                 InjectPosition.BeforeAll::class -> {
-                    method.instructions.insert(insnList)
+                    method.instructions.insert(finalList)
                 }
 
                 InjectPosition.BeforeTail::class -> {
                     method.instructions.insertBefore(
                         method.instructions.last.previous,
-                        insnList
+                        finalList
                     )
                 }
 
@@ -420,20 +437,20 @@ object InjectorClassTransformer : IClassTransformer {
                         .filterIsInstance<MethodInsnNode>()
                         .first {
                             it.name == pos.name &&
-                                it.desc == pos.descriptor &&
-                                it.owner == pos.owner
+                                    it.desc == pos.descriptor &&
+                                    it.owner == pos.owner
                         }
 
                     when (pos.position) {
                         InjectPosition.InvokePosition.AFTER ->
                             method.instructions.insert(
                                 targetInstruction,
-                                insnList
+                                finalList
                             )
                         InjectPosition.InvokePosition.BEFORE ->
                             method.instructions.insertBefore(
                                 targetInstruction,
-                                insnList
+                                finalList
                             )
                     }
                 }

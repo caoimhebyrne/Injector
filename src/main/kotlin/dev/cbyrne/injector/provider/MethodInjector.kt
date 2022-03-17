@@ -25,5 +25,7 @@ data class MethodInjector<Any>(
     val method: String,
     val descriptor: String,
     val position: InjectPosition,
+    val catchLocals: Boolean,
+    val catchFields: Boolean,
     val code: Any.(InjectorParams) -> Unit
 )

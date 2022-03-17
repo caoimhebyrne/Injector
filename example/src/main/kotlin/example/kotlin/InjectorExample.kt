@@ -23,7 +23,7 @@ import codes.som.anthony.koffee.types.long
 import codes.som.anthony.koffee.types.void
 import dev.cbyrne.injector.Injector
 import dev.cbyrne.injector.dsl.beforeInvoke
-import dev.cbyrne.injector.dsl.beforeReturn
+import dev.cbyrne.injector.dsl.beforeTail
 import dev.cbyrne.injector.dsl.descriptor
 import dev.cbyrne.injector.dsl.injectMethod
 import dev.cbyrne.injector.position.InjectPosition
@@ -75,7 +75,7 @@ fun main() {
         "example/TargetClass",
         "print",
         methodDesc,
-        beforeReturn
+        beforeTail
     ) { (_, fields, _) ->
         val privateField = fields.getOrError("privateField")
 

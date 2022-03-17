@@ -28,7 +28,7 @@ import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 
 val beforeAll = InjectPosition.BeforeAll
-val beforeReturn = InjectPosition.BeforeTail
+val beforeTail = InjectPosition.BeforeTail
 
 fun afterInvoke(className: String, methodName: String, descriptor: String) =
     InjectPosition.Invoke(className, methodName, descriptor, InjectPosition.InvokePosition.AFTER)
@@ -63,8 +63,10 @@ fun <T> injectMethod(
     methodName: String,
     descriptor: String,
     position: InjectPosition = InjectPosition.BeforeAll,
+    catchLocals: Boolean = true,
+    catchFields: Boolean = true,
     code: T.(InjectorParams) -> Unit,
-) = Injector.inject(className, methodName, descriptor, position, code)
+) = Injector.inject(className, methodName, descriptor, position, catchLocals, catchFields, code)
 
 @JvmName("injectMethodNonTyped")
 fun injectMethod(
@@ -72,5 +74,7 @@ fun injectMethod(
     methodName: String,
     descriptor: String,
     position: InjectPosition = InjectPosition.BeforeAll,
+    catchLocals: Boolean = true,
+    catchFields: Boolean = true,
     code: Any.(InjectorParams) -> Unit,
-) = Injector.inject(className, methodName, descriptor, position, code)
+) = Injector.inject(className, methodName, descriptor, position, catchLocals, catchFields, code)
