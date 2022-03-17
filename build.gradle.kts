@@ -156,10 +156,11 @@ tasks {
                 remoteUrl.set(URL("https://${Coordinates.GIT_HOST}/${Coordinates.REPO_ID}/tree/trunk/src"))
             }
 
-            // External documentation link template
-//            externalDocumentationLink {
-//                url.set(URL("https://javadoc.io/doc/net.java.dev.jna/jna/5.10.0/"))
-//            }
+            // Deface external documentation links
+            externalDocumentationLink {
+                packageListUrl.set(URL("https://stardust-enterprises.github.io/deface/deface/package-list"))
+                url.set(URL("https://stardust-enterprises.github.io/deface/"))
+            }
         }
     }
 
