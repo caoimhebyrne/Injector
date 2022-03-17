@@ -20,7 +20,7 @@ package dev.cbyrne.injector.position
 
 sealed class InjectPosition {
     object BeforeAll : InjectPosition()
-    object BeforeReturn : InjectPosition()
+    object BeforeTail : InjectPosition()
 
     class Invoke(
         val owner: String,

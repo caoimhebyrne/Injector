@@ -40,6 +40,18 @@ public class InjectorParams {
         this.retInfo = retInfo;
     }
 
+    public List<Object> getParams() {
+        return this.params;
+    }
+
+    public Map<String, Object> getFields() {
+        return this.fields;
+    }
+
+    public ReturnInfo getReturnInfo() {
+        return this.retInfo;
+    }
+
     public List<Object> component1() {
         return this.params;
     }

@@ -24,7 +24,6 @@ import dev.cbyrne.injector.provider.MethodInjector
 import dev.cbyrne.injector.transform.InjectorClassTransformer
 import fr.stardustenterprises.deface.engine.NativeTransformationService
 import net.gudenau.lib.unsafe.Unsafe
-import java.util.function.BiConsumer
 
 object Injector {
     init {
@@ -73,29 +72,6 @@ object Injector {
         position: InjectPosition = InjectPosition.BeforeAll,
         code: Any.(InjectorParams) -> Unit,
     ) = directInject(className, method, descriptor, position, code)
-
-    @JvmStatic
-    fun <T> inject(
-        className: String,
-        method: String,
-        descriptor: String,
-        position: InjectPosition = InjectPosition.BeforeAll,
-        consumer: BiConsumer<T, InjectorParams>,
-    ) = directInject<T>(className, method, descriptor, position) { params ->
-        consumer.accept(this, params)
-    }
-
-    @JvmStatic
-    @JvmName("injectNonTyped")
-    fun inject(
-        className: String,
-        method: String,
-        descriptor: String,
-        position: InjectPosition = InjectPosition.BeforeAll,
-        consumer: BiConsumer<Any, InjectorParams>,
-    ) = directInject<Any>(className, method, descriptor, position) { params ->
-        consumer.accept(this, params)
-    }
 
     private fun <T> directInject(
         className: String,

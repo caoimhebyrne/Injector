@@ -28,7 +28,7 @@ import kotlin.reflect.KFunction
 import kotlin.reflect.jvm.javaMethod
 
 val beforeAll = InjectPosition.BeforeAll
-val beforeReturn = InjectPosition.BeforeReturn
+val beforeReturn = InjectPosition.BeforeTail
 
 fun afterInvoke(className: String, methodName: String, descriptor: String) =
     InjectPosition.Invoke(className, methodName, descriptor, InjectPosition.InvokePosition.AFTER)

@@ -25,9 +25,19 @@ import example.TargetClass;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 
+/**
+ * The Java syntax is still very much WIP, but
+ * can be considered as in a usable state.
+ *
+ * This is more of an example as to why you *shouldn't*
+ * use it, though it can be useful in specific situations.
+ *
+ * @author xtrm-en
+ */
 public class InjectorExample {
+    // We cannot use lambda expressions when
+    // declaring hooks in Java.
     public static void main(String[] args) {
-        // We cannot use lambda expressions in Java
         //noinspection Convert2Lambda
         Injector.inject(
                 "example/TargetClass",
@@ -38,6 +48,21 @@ public class InjectorExample {
                     @Override
                     public Unit invoke(Object instance, InjectorParams injectorParams) {
                         System.out.println("[InjectorExample] Before all");
+                        return Unit.INSTANCE;
+                    }
+                }
+        );
+
+        //noinspection Convert2Lambda
+        Injector.inject(
+                "example/TargetClass",
+                "print",
+                "(Ljava/lang/String;Ljava/lang/String;JJZ)V",
+                InjectPosition.BeforeTail.INSTANCE,
+                new Function2<>() {
+                    @Override
+                    public Unit invoke(Object instance, InjectorParams injectorParams) {
+                        System.out.println("[InjectorExample] Before tail");
                         return Unit.INSTANCE;
                     }
                 }

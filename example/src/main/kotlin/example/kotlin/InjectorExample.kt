@@ -42,9 +42,9 @@ fun main() {
         "example.TargetClass",
         "print",
         "(Ljava/lang/String;Ljava/lang/String;JJZ)V",
-        InjectPosition.BeforeReturn
+        InjectPosition.BeforeTail
     ) {
-        println("[InjectorExample] Before return")
+        println("[InjectorExample] Before tail")
     }
 
     // You can also use the DSL syntax, with this you can reference a function in your invoke position

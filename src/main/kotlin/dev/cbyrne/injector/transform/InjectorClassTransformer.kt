@@ -23,6 +23,7 @@ import codes.som.anthony.koffee.assembleClass
 import codes.som.anthony.koffee.insns.jvm.*
 import codes.som.anthony.koffee.modifiers.public
 import codes.som.anthony.koffee.modifiers.static
+import dev.cbyrne.injector.dsl.descriptor
 import dev.cbyrne.injector.position.InjectPosition
 import dev.cbyrne.injector.provider.InjectorParams
 import dev.cbyrne.injector.provider.MethodInjector
@@ -35,18 +36,15 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
-import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.InsnList
-import org.objectweb.asm.tree.MethodInsnNode
-import org.objectweb.asm.tree.VarInsnNode
+import org.objectweb.asm.tree.*
 import java.lang.reflect.Modifier
 import java.nio.file.Files
 import java.security.ProtectionDomain
 
 object InjectorClassTransformer : IClassTransformer {
     private const val INJECTOR_NAMESPACE = "injector$"
-    private const val debug: Boolean = true
 
+    private const val debug: Boolean = false
     private val debugDumpDir by lazy { Files.createTempDirectory("injector_dump") }
 
     private val exclusions: MutableList<String> =
@@ -172,6 +170,7 @@ object InjectorClassTransformer : IClassTransformer {
         }
         if (methodInjectors.isEmpty()) return false
 
+        // Create a hook class that may be used
         var hookUsed = false
         val hookContainerClass = assembleClass(
             public,
@@ -180,7 +179,6 @@ object InjectorClassTransformer : IClassTransformer {
                 hookContainerIndex,
             Opcodes.V1_8
         ) {}
-        hookContainerIndex++
 
         // Apply method injectors
         methodInjectors.forEach { injector ->
@@ -216,18 +214,32 @@ object InjectorClassTransformer : IClassTransformer {
             val injectorMethodName = "injector\$method" +
                 methodInjectors.indexOf(injector)
 
+            // "Normalize" instructions, decrement the stack pointer,
+            // and remove `return Unit`
             val insns = InsnList()
-            invokeMethod.instructions.map {
+            invokeMethod.instructions.mapNotNull {
                 if (it is VarInsnNode) {
                     it.`var` -= 1
+                }
+                if (it.opcode == Opcodes.GETSTATIC) {
+                    if (it.next?.opcode == Opcodes.ARETURN) {
+                        return@mapNotNull null
+                    }
+                }
+                if (it.opcode == Opcodes.ARETURN) {
+                    return@mapNotNull InsnNode(Opcodes.RETURN)
                 }
                 it
             }.forEach(insns::add)
 
+            val arguments = Type.getArgumentTypes(invokeMethod.desc)
+
+            val hookDesc = descriptor(Type.VOID_TYPE, *arguments)
+
             hookContainerClass.addMethod(
                 public + static,
                 injectorMethodName,
-                invokeMethod.desc,
+                hookDesc,
                 insns
             )
 
@@ -352,7 +364,7 @@ object InjectorClassTransformer : IClassTransformer {
                 invokestatic(
                     hookContainerClass.name,
                     injectorMethodName,
-                    invokeMethod.desc
+                    hookDesc
                 )
 
                 // Go to the label retIfTrue if the method was cancelled
@@ -395,7 +407,7 @@ object InjectorClassTransformer : IClassTransformer {
                     method.instructions.insert(insnList)
                 }
 
-                InjectPosition.BeforeReturn::class -> {
+                InjectPosition.BeforeTail::class -> {
                     method.instructions.insertBefore(
                         method.instructions.last.previous,
                         insnList
@@ -429,6 +441,7 @@ object InjectorClassTransformer : IClassTransformer {
         }
 
         if (hookUsed) {
+            hookContainerIndex++
             defineClass(hookContainerClass, classLoader = classLoader)
         }
 

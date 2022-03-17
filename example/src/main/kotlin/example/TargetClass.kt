@@ -16,6 +16,8 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("UNUSED_PARAMETER")
+
 package example
 
 class TargetClass {
