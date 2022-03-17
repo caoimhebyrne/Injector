@@ -45,7 +45,9 @@ object InjectorClassTransformer : IClassTransformer {
     private const val INJECTOR_NAMESPACE = "injector$"
 
     private const val debug: Boolean = false
-    private val debugDumpDir by lazy { Files.createTempDirectory("injector_dump") }
+    private val debugDumpDir by lazy {
+        Files.createTempDirectory("injector_dump")
+    }
 
     private val exclusions: MutableList<String> =
         mutableListOf(
@@ -62,7 +64,8 @@ object InjectorClassTransformer : IClassTransformer {
     private var hookContainerIndex = 0
 
     private val cache = mutableMapOf<String, ByteArray>()
-    private val hookContainerCache = mutableMapOf<MethodInjector<*>, ClassNode>()
+    private val hookContainerCache =
+        mutableMapOf<MethodInjector<*>, ClassNode>()
 
     val methodInjectors = mutableListOf<MethodInjector<*>>()
 
@@ -575,35 +578,75 @@ object InjectorClassTransformer : IClassTransformer {
             when (type.sort) {
                 Type.INT -> {
                     iload(index)
-                    invokestatic(java.lang.Integer::class, "valueOf", java.lang.Integer::class, int)
+                    invokestatic(
+                        java.lang.Integer::class,
+                        "valueOf",
+                        java.lang.Integer::class,
+                        int
+                    )
                 }
                 Type.FLOAT -> {
                     fload(index)
-                    invokestatic(java.lang.Float::class, "valueOf", java.lang.Float::class, float)
+                    invokestatic(
+                        java.lang.Float::class,
+                        "valueOf",
+                        java.lang.Float::class,
+                        float
+                    )
                 }
                 Type.LONG -> {
                     lload(index)
-                    invokestatic(java.lang.Long::class, "valueOf", java.lang.Long::class, long)
+                    invokestatic(
+                        java.lang.Long::class,
+                        "valueOf",
+                        java.lang.Long::class,
+                        long
+                    )
                 }
                 Type.DOUBLE -> {
                     dload(index)
-                    invokestatic(java.lang.Double::class, "valueOf", java.lang.Double::class, double)
+                    invokestatic(
+                        java.lang.Double::class,
+                        "valueOf",
+                        java.lang.Double::class,
+                        double
+                    )
                 }
                 Type.BOOLEAN -> {
                     iload(index)
-                    invokestatic(java.lang.Boolean::class, "valueOf", java.lang.Boolean::class, boolean)
+                    invokestatic(
+                        java.lang.Boolean::class,
+                        "valueOf",
+                        java.lang.Boolean::class,
+                        boolean
+                    )
                 }
                 Type.SHORT -> {
                     iload(index)
-                    invokestatic(java.lang.Short::class, "valueOf", java.lang.Short::class, short)
+                    invokestatic(
+                        java.lang.Short::class,
+                        "valueOf",
+                        java.lang.Short::class,
+                        short
+                    )
                 }
                 Type.BYTE -> {
                     iload(index)
-                    invokestatic(java.lang.Byte::class, "valueOf", java.lang.Byte::class, byte)
+                    invokestatic(
+                        java.lang.Byte::class,
+                        "valueOf",
+                        java.lang.Byte::class,
+                        byte
+                    )
                 }
                 Type.CHAR -> {
                     iload(index)
-                    invokestatic(java.lang.Character::class, "valueOf", java.lang.Character::class, char)
+                    invokestatic(
+                        java.lang.Character::class,
+                        "valueOf",
+                        java.lang.Character::class,
+                        char
+                    )
                 }
                 Type.OBJECT -> aload(index)
                 Type.ARRAY -> aload(index)
@@ -614,28 +657,68 @@ object InjectorClassTransformer : IClassTransformer {
         assembleBlock {
             when (type.sort) {
                 Type.INT -> {
-                    invokestatic(java.lang.Integer::class, "valueOf", java.lang.Integer::class, int)
+                    invokestatic(
+                        java.lang.Integer::class,
+                        "valueOf",
+                        java.lang.Integer::class,
+                        int
+                    )
                 }
                 Type.FLOAT -> {
-                    invokestatic(java.lang.Float::class, "valueOf", java.lang.Float::class, float)
+                    invokestatic(
+                        java.lang.Float::class,
+                        "valueOf",
+                        java.lang.Float::class,
+                        float
+                    )
                 }
                 Type.LONG -> {
-                    invokestatic(java.lang.Long::class, "valueOf", java.lang.Long::class, long)
+                    invokestatic(
+                        java.lang.Long::class,
+                        "valueOf",
+                        java.lang.Long::class,
+                        long
+                    )
                 }
                 Type.DOUBLE -> {
-                    invokestatic(java.lang.Double::class, "valueOf", java.lang.Double::class, double)
+                    invokestatic(
+                        java.lang.Double::class,
+                        "valueOf",
+                        java.lang.Double::class,
+                        double
+                    )
                 }
                 Type.BOOLEAN -> {
-                    invokestatic(java.lang.Boolean::class, "valueOf", java.lang.Boolean::class, boolean)
+                    invokestatic(
+                        java.lang.Boolean::class,
+                        "valueOf",
+                        java.lang.Boolean::class,
+                        boolean
+                    )
                 }
                 Type.SHORT -> {
-                    invokestatic(java.lang.Short::class, "valueOf", java.lang.Short::class, short)
+                    invokestatic(
+                        java.lang.Short::class,
+                        "valueOf",
+                        java.lang.Short::class,
+                        short
+                    )
                 }
                 Type.BYTE -> {
-                    invokestatic(java.lang.Byte::class, "valueOf", java.lang.Byte::class, byte)
+                    invokestatic(
+                        java.lang.Byte::class,
+                        "valueOf",
+                        java.lang.Byte::class,
+                        byte
+                    )
                 }
                 Type.CHAR -> {
-                    invokestatic(java.lang.Character::class, "valueOf", java.lang.Character::class, char)
+                    invokestatic(
+                        java.lang.Character::class,
+                        "valueOf",
+                        java.lang.Character::class,
+                        char
+                    )
                 }
             }
         }.first
