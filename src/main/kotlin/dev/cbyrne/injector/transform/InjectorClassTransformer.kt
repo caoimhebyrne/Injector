@@ -175,8 +175,8 @@ object InjectorClassTransformer : IClassTransformer {
         val hookContainerClass = assembleClass(
             public,
             "$INJECTOR_NAMESPACE/${classNode.name}" +
-                    "_Hook_" +
-                    hookContainerIndex,
+                "_Hook_" +
+                hookContainerIndex,
             Opcodes.V1_8
         ) {}
 
@@ -194,8 +194,8 @@ object InjectorClassTransformer : IClassTransformer {
             if (debug) {
                 println(
                     "[InjectorClassTransformer] Applying injector for " +
-                            "${classNode.name}.${method.name}${method.desc}" +
-                            " @ ${injector.position}"
+                        "${classNode.name}.${method.name}${method.desc}" +
+                        " @ ${injector.position}"
                 )
             }
 
@@ -208,11 +208,11 @@ object InjectorClassTransformer : IClassTransformer {
             // and write it to our own function
             val invokeMethod = codeNode.methods.first {
                 it.name == "invoke" &&
-                        (it.access and Opcodes.ACC_SYNTHETIC == 0)
+                    (it.access and Opcodes.ACC_SYNTHETIC == 0)
             }
 
             val injectorMethodName = "injector\$method" +
-                    methodInjectors.indexOf(injector)
+                methodInjectors.indexOf(injector)
 
             // "Normalize" instructions, decrement the stack pointer,
             // and remove `return Unit`
@@ -291,9 +291,9 @@ object InjectorClassTransformer : IClassTransformer {
                         instructions.add(
                             primitiveConversionInsnList(
                                 index +
-                                        isStatic +
-                                        offset +
-                                        previousParameterOffset,
+                                    isStatic +
+                                    offset +
+                                    previousParameterOffset,
                                 type
                             )
                         )
@@ -437,8 +437,8 @@ object InjectorClassTransformer : IClassTransformer {
                         .filterIsInstance<MethodInsnNode>()
                         .first {
                             it.name == pos.name &&
-                                    it.desc == pos.descriptor &&
-                                    it.owner == pos.owner
+                                it.desc == pos.descriptor &&
+                                it.owner == pos.owner
                         }
 
                     when (pos.position) {
