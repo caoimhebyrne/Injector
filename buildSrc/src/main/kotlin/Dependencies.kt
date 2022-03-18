@@ -31,7 +31,7 @@ object Plugins {
 object Dependencies {
     const val KOTLIN = kotlinVersion
     const val ASM = "9.2"
-    const val UNSAFE = "1.7.2"
+    const val UNSAFE = "1.7.3"
     const val DEFACE = "0.2.0"
     const val KOFFEE = "8.0.2"
 }

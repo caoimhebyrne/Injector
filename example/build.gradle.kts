@@ -24,6 +24,7 @@ group = "dev.cbyrne.injector.example"
 version = "1.0-SNAPSHOT"
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven("https://maven.hackery.site/")
     maven("https://jitpack.io/")

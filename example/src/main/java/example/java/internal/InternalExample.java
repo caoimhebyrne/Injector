@@ -56,12 +56,17 @@ public class InternalExample {
                 new Function2<URL, InjectorParams, Unit>() {
                     @Override
                     public Unit invoke(URL instance, InjectorParams injectorParams) {
-                        System.out.println("URL Created: " + injectorParams.getParams().get(1));
+                        String url = (String) injectorParams.getParams().get(1);
+                        System.out.println("URL Created: " + url);
                         return Unit.INSTANCE;
                     }
                 }
         );
         
         new URL("https://github.com/xtrm-en");
+    }
+
+    public static void yes(String param) {
+        System.out.println("URL: " + param);
     }
 }
