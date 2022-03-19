@@ -176,19 +176,21 @@ tasks {
             return match.groupValues[1]
         }
 
+        val javaVersion = System.getProperty("java.version")
+        val javaVendor = System.getProperty("java.vendor")
+        val javaVmVersion = System.getProperty("java.vm.version")
+
         val buildTimeAndDate = OffsetDateTime.now()
         val buildDate = DateTimeFormatter.ISO_LOCAL_DATE.format(buildTimeAndDate)
         val buildTime = DateTimeFormatter.ofPattern("HH:mm:ss.SSSZ").format(buildTimeAndDate)
 
-        val javaVersion = System.getProperty("java.version")
-        val javaVendor = System.getProperty("java.vendor")
-        val javaVmVersion = System.getProperty("java.vm.version")
+        val buildRev = grgit.log()[0].id
 
         mapOf(
             "Created-By" to "$javaVersion ($javaVendor $javaVmVersion)",
             "Build-Date" to buildDate,
             "Build-Time" to buildTime,
-            "Build-Revision" to grgit.log()[0].id,
+            "Build-Revision" to buildRev,
             "Specification-Title" to project.name,
             "Specification-Version" to normalizeVersion(project.version.toString()),
             "Specification-Vendor" to Coordinates.VENDOR,
