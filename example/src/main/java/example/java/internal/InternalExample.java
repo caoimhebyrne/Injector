@@ -32,16 +32,16 @@ import java.net.URLStreamHandler;
 
 /**
  * This is where it gets spicy. 🔥
- *
+ * <p>
  * This is a simple Proof Of Concept, you're gonna need
  * a bit more engineering to make something useful out of this,
  * aka allow your classes to be called from the bootclassloader.
- *
+ * <p>
  * Doing this in Java is necessary because the Kotlin compiler
  * will try sticking his <code>Intrinsics</code> calls everywhere,
  * and it gets quite messy really quick.
  *
- * @author xtrm 
+ * @author xtrm
  */
 public class InternalExample {
     public static void main(String[] args) throws MalformedURLException {
@@ -57,16 +57,37 @@ public class InternalExample {
                     @Override
                     public Unit invoke(URL instance, InjectorParams injectorParams) {
                         String url = (String) injectorParams.getParams().get(1);
-                        System.out.println("URL Created: " + url);
+
+                        // You can't directly call this method since its class,
+                        // example.java.internal.InternalExample
+                        // is defined on the System ClassLoader, and URL is
+                        // defined on a higher classloader in the hierarchy,
+                        // so it doesn't have access to its children's classes.
+                        try {
+                            catchURL(url);
+                        } catch (NoClassDefFoundError ignored) {
+                        }
+
+                        // To combat this behavior, you could use Reflection
+                        // to get the class from another ClassLoader
+                        // (the system classloader for instance) and then
+                        // call the method.
+                        try {
+                            Class.forName("example.java.internal.InternalExample", true, ClassLoader.getSystemClassLoader())
+                                    .getDeclaredMethod("catchURL", String.class)
+                                    .invoke(null, url);
+                        } catch (Throwable ignored) {
+                        }
+
                         return Unit.INSTANCE;
                     }
                 }
         );
-        
+
         new URL("https://github.com/xtrm-en");
     }
 
-    public static void yes(String param) {
-        System.out.println("URL: " + param);
+    public static void catchURL(String param) {
+        System.out.println("Caught URL: " + param);
     }
 }
